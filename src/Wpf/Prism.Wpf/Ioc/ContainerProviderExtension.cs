@@ -1,5 +1,12 @@
 ﻿using System;
+#if HAS_WINUI
+using Microsoft.UI.Xaml.Markup;
+using Microsoft.UI.Xaml;
+
+#else
 using System.Windows.Markup;
+#endif
+
 
 namespace Prism.Ioc
 {
@@ -55,12 +62,28 @@ namespace Prism.Ioc
         /// </summary>
         public string Name { get; set; }
 
+#if HAS_WINUI
+        /// <summary>
+        /// Provide resolved object from <see cref="ContainerLocator"/>
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
+        protected override object ProvideValue(IXamlServiceProvider serviceProvider)
+        {
+            return ResolveObject();
+        }
+#else
         /// <summary>
         /// Provide resolved object from <see cref="ContainerLocator"/>
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <returns></returns>
         public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return ResolveObject();
+        }
+#endif
+        private object ResolveObject()
         {
             return string.IsNullOrEmpty(Name)
                 ? ContainerLocator.Container?.Resolve(Type)

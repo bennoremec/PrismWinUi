@@ -4,17 +4,17 @@ using Prism.Modularity;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Regions.Behaviors;
-using Prism.Services.Dialogs;
-
 #if HAS_UWP
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Prism.Services.Dialogs;
 #elif HAS_WINUI
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 #else
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using Prism.Services.Dialogs;
 #endif
 
 namespace Prism
@@ -32,7 +32,6 @@ namespace Prism
         internal static void RegisterRequiredTypes(this IContainerRegistry containerRegistry, IModuleCatalog moduleCatalog)
         {
             containerRegistry.RegisterInstance(moduleCatalog);
-            containerRegistry.RegisterSingleton<IDialogService, DialogService>();
             containerRegistry.RegisterSingleton<IModuleInitializer, ModuleInitializer>();
             containerRegistry.RegisterSingleton<IModuleManager, ModuleManager>();
             containerRegistry.RegisterSingleton<RegionAdapterMappings>();
@@ -44,7 +43,11 @@ namespace Prism
             containerRegistry.Register<IRegionNavigationJournalEntry, RegionNavigationJournalEntry>();
             containerRegistry.Register<IRegionNavigationJournal, RegionNavigationJournal>();
             containerRegistry.Register<IRegionNavigationService, RegionNavigationService>();
+
+#if !HAS_WINUI
+            containerRegistry.RegisterSingleton<IDialogService, DialogService>();
             containerRegistry.Register<IDialogWindow, DialogWindow>(); //default dialog host
+#endif
         }
 
         internal static void RegisterDefaultRegionBehaviors(this IRegionBehaviorFactory regionBehaviors)

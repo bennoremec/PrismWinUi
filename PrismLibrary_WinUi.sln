@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D15583CB-377C-4203-9C7B-8EB794808564}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WinUi", "WinUi", "{F73844CC-929F-4B09-9F58-A609FE4E246C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.WinUI", "src\WinUi\Prism.WinUI\Prism.WinUI.csproj", "{1338E0D9-63F3-4355-A485-16F9473E2F43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.Unity.WinUI", "src\WinUi\Prism.Unity.WinUI\Prism.Unity.WinUI.csproj", "{7F17E0F0-53B9-473F-B97E-99A911170302}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", "{D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Prism.Unity.Shared", "src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.shproj", "{D66336A6-07E5-401A-A710-DAEDD6975D59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.Core", "src\Prism.Core\Prism.Core.csproj", "{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{7f17e0f0-53b9-473f-b97e-99a911170302}*SharedItemsImports = 5
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{d66336a6-07e5-401a-a710-daedd6975d59}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1338E0D9-63F3-4355-A485-16F9473E2F43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1338E0D9-63F3-4355-A485-16F9473E2F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1338E0D9-63F3-4355-A485-16F9473E2F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1338E0D9-63F3-4355-A485-16F9473E2F43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F17E0F0-53B9-473F-B97E-99A911170302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F17E0F0-53B9-473F-B97E-99A911170302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F17E0F0-53B9-473F-B97E-99A911170302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F17E0F0-53B9-473F-B97E-99A911170302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F73844CC-929F-4B09-9F58-A609FE4E246C} = {D15583CB-377C-4203-9C7B-8EB794808564}
+		{1338E0D9-63F3-4355-A485-16F9473E2F43} = {F73844CC-929F-4B09-9F58-A609FE4E246C}
+		{7F17E0F0-53B9-473F-B97E-99A911170302} = {F73844CC-929F-4B09-9F58-A609FE4E246C}
+		{D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58} = {D15583CB-377C-4203-9C7B-8EB794808564}
+		{D66336A6-07E5-401A-A710-DAEDD6975D59} = {D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58}
+		{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD} = {D15583CB-377C-4203-9C7B-8EB794808564}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF540779-5D31-4280-8F83-1A80F285E076}
+	EndGlobalSection
+EndGlobal

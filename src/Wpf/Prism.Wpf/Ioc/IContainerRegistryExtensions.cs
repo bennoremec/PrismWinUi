@@ -8,6 +8,7 @@ namespace Prism.Ioc
     /// </summary>
     public static class IContainerRegistryExtensions
     {
+#if !HAS_WINUI
         /// <summary>
         /// Registers an object to be used as a dialog in the IDialogService.
         /// </summary>
@@ -51,6 +52,7 @@ namespace Prism.Ioc
         {
             containerRegistry.Register(typeof(Services.Dialogs.IDialogWindow), typeof(TWindow), name);
         }
+#endif
 
         /// <summary>
         /// Registers an object for navigation

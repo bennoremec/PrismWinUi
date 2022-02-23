@@ -1,9 +1,14 @@
 ﻿using System;
-using System.Windows;
 using Prism.Common;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
+#if HAS_WINUI
+using Microsoft.UI.Xaml;
+
+#else
+using System.Windows;
+#endif
 
 namespace Prism
 {
@@ -150,6 +155,14 @@ namespace Prism
         /// <returns>The shell of the application.</returns>
         protected abstract DependencyObject CreateShell();
 
+#if HAS_WINUI
+        /// <summary>
+        /// Gets the main window of the application.
+        /// </summary>
+        /// <returns>The main window of the application.</returns>
+        protected abstract Window GetMainWindow();
+#endif
+
         /// <summary>
         /// Initializes the shell.
         /// </summary>
@@ -163,8 +176,12 @@ namespace Prism
         /// </summary>
         protected virtual void OnInitialized()
         {
+#if HAS_WINUI
+            GetMainWindow().Activate();
+#else
             if (Shell is Window window)
                 window.Show();
+#endif
         }
 
         /// <summary>

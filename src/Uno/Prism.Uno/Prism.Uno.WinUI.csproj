@@ -6,7 +6,7 @@
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
     <AssemblyName>Prism.Uno</AssemblyName>
     <RootNamespace>Prism</RootNamespace>
-    <DefineConstants>$(DefineConstants);HAS_WINUI</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_WINUI;HAS_UNO_WINUI</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <PackageId>Prism.Uno.WinUI</PackageId>
     <GenerateLibraryLayout>true</GenerateLibraryLayout>

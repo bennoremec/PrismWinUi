@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Prism.Unity.WinUI</RootNamespace>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Wpf\Prism.Unity.Wpf\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Unity.Wpf\PrismBootstrapper.cs" Link="PrismBootstrapper.cs" />
+    <Compile Include="..\..\Wpf\Prism.Unity.Wpf\Properties\Resources.Designer.cs" Link="Properties\Resources.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Wpf\Prism.Unity.Wpf\Properties\Resources.resx" Link="Properties\Resources.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation">
+    </PackageReference>
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI">
+    </PackageReference>
+      <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences">
+      </PackageReference>
+      <PackageReference Include="System.Configuration.ConfigurationManager" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Unity.Container" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Prism.WinUI\Prism.WinUI.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems" Label="Shared" />
+</Project>

@@ -1,9 +1,9 @@
-using System.ComponentModel;
-
 #if HAS_WINUI
-using Windows.UI.Xaml;
+using Microsoft.UI.Xaml;
+
 #else
 using System.Windows;
+using System.ComponentModel;
 #endif
 
 namespace Prism.Mvvm

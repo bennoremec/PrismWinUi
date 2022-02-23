@@ -1,0 +1,149 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+	<AssemblyName>Prism.WinUI</AssemblyName>
+    <RootNamespace>Prism</RootNamespace>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+	<DefineConstants>$(DefineConstants);HAS_WINUI</DefineConstants>
+    <UseWinUI>true</UseWinUI>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Wpf\Prism.Wpf\Common\MvvmHelpers.cs" Link="Common\MvvmHelpers.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Common\ObservableObject.cs" Link="Common\ObservableObject.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Common\UriParsingHelper.cs" Link="Common\UriParsingHelper.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Extensions\CollectionExtensions.cs" Link="Extensions\CollectionExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Extensions\DependencyObjectExtensions.cs" Link="Extensions\DependencyObjectExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Interactivity\CommandBehaviorBase.cs" Link="Interactivity\CommandBehaviorBase.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Ioc\ContainerProviderExtension.cs" Link="Ioc\ContainerProviderExtension.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Ioc\IContainerRegistryExtensions.cs" Link="Ioc\IContainerRegistryExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\AssemblyResolver.Desktop.cs" Link="Modularity\AssemblyResolver.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ConfigurationModuleCatalog.Desktop.cs" Link="Modularity\ConfigurationModuleCatalog.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ConfigurationStore.Desktop.cs" Link="Modularity\ConfigurationStore.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\DirectoryModuleCatalog.netcore.cs" Link="Modularity\DirectoryModuleCatalog.netcore.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\FileModuleTypeLoader.Desktop.cs" Link="Modularity\FileModuleTypeLoader.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\IAssemblyResolver.Desktop.cs" Link="Modularity\IAssemblyResolver.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\IConfigurationStore.Desktop.cs" Link="Modularity\IConfigurationStore.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\IModuleCatalogExtensions.cs" Link="Modularity\IModuleCatalogExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\IModuleGroupsCatalog.cs" Link="Modularity\IModuleGroupsCatalog.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\IModuleTypeLoader.cs" Link="Modularity\IModuleTypeLoader.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleAttribute.Desktop.cs" Link="Modularity\ModuleAttribute.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleCatalog.cs" Link="Modularity\ModuleCatalog.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleConfigurationElement.Desktop.cs" Link="Modularity\ModuleConfigurationElement.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleConfigurationElementCollection.Desktop.cs" Link="Modularity\ModuleConfigurationElementCollection.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleDependencyCollection.Desktop.cs" Link="Modularity\ModuleDependencyCollection.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleDependencyConfigurationElement.Desktop.cs" Link="Modularity\ModuleDependencyConfigurationElement.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleInfo.cs" Link="Modularity\ModuleInfo.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleInfo.Desktop.cs" Link="Modularity\ModuleInfo.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleInfoGroup.cs" Link="Modularity\ModuleInfoGroup.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleInfoGroupExtensions.cs" Link="Modularity\ModuleInfoGroupExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleInitializer.cs" Link="Modularity\ModuleInitializer.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleManager.cs" Link="Modularity\ModuleManager.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleManager.Desktop.cs" Link="Modularity\ModuleManager.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModulesConfigurationSection.Desktop.cs" Link="Modularity\ModulesConfigurationSection.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleTypeLoaderNotFoundException.cs" Link="Modularity\ModuleTypeLoaderNotFoundException.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleTypeLoaderNotFoundException.Desktop.cs" Link="Modularity\ModuleTypeLoaderNotFoundException.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Mvvm\ViewModelLocator.cs" Link="Mvvm\ViewModelLocator.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\PrismBootstrapperBase.cs" Link="PrismBootstrapperBase.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\PrismInitializationExtensions.cs" Link="PrismInitializationExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Properties\Resources.Designer.cs" Link="Properties\Resources.Designer.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\AllActiveRegion.cs" Link="Regions\AllActiveRegion.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\AutoPopulateRegionBehavior.cs" Link="Regions\Behaviors\AutoPopulateRegionBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\BindRegionContextToDependencyObjectBehavior.cs" Link="Regions\Behaviors\BindRegionContextToDependencyObjectBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\ClearChildViewsRegionBehavior.cs" Link="Regions\Behaviors\ClearChildViewsRegionBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\DelayedRegionCreationBehavior.cs" Link="Regions\Behaviors\DelayedRegionCreationBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\DestructibleRegionBehavior.cs" Link="Regions\Behaviors\DestructibleRegionBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\IHostAwareRegionBehavior.cs" Link="Regions\Behaviors\IHostAwareRegionBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\RegionActiveAwareBehavior.cs" Link="Regions\Behaviors\RegionActiveAwareBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\RegionCreationException.cs" Link="Regions\Behaviors\RegionCreationException.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\RegionCreationException.Desktop.cs" Link="Regions\Behaviors\RegionCreationException.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\RegionManagerRegistrationBehavior.cs" Link="Regions\Behaviors\RegionManagerRegistrationBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\RegionMemberLifetimeBehavior.cs" Link="Regions\Behaviors\RegionMemberLifetimeBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\SelectorItemsSourceSyncBehavior.cs" Link="Regions\Behaviors\SelectorItemsSourceSyncBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Behaviors\SyncRegionContextWithHostBehavior.cs" Link="Regions\Behaviors\SyncRegionContextWithHostBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ContentControlRegionAdapter.cs" Link="Regions\ContentControlRegionAdapter.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\DefaultRegionManagerAccessor.cs" Link="Regions\DefaultRegionManagerAccessor.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IConfirmNavigationRequest.cs" Link="Regions\IConfirmNavigationRequest.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IJournalAware.cs" Link="Regions\IJournalAware.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\INavigateAsync.cs" Link="Regions\INavigateAsync.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\INavigationAware.cs" Link="Regions\INavigationAware.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegion.cs" Link="Regions\IRegion.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionAdapter.cs" Link="Regions\IRegionAdapter.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionBehavior.cs" Link="Regions\IRegionBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionBehaviorCollection.cs" Link="Regions\IRegionBehaviorCollection.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionBehaviorFactory.cs" Link="Regions\IRegionBehaviorFactory.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionBehaviorFactoryExtensions.cs" Link="Regions\IRegionBehaviorFactoryExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionCollection.cs" Link="Regions\IRegionCollection.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionManager.cs" Link="Regions\IRegionManager.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionManagerAccessor.cs" Link="Regions\IRegionManagerAccessor.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionManagerExtensions.cs" Link="Regions\IRegionManagerExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionMemberLifetime.cs" Link="Regions\IRegionMemberLifetime.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionNavigationContentLoader.cs" Link="Regions\IRegionNavigationContentLoader.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionNavigationJournal.cs" Link="Regions\IRegionNavigationJournal.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionNavigationJournalEntry.cs" Link="Regions\IRegionNavigationJournalEntry.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionNavigationService.cs" Link="Regions\IRegionNavigationService.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IRegionViewRegistry.cs" Link="Regions\IRegionViewRegistry.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ItemMetadata.cs" Link="Regions\ItemMetadata.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ItemsControlRegionAdapter.cs" Link="Regions\ItemsControlRegionAdapter.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\IViewsCollection.cs" Link="Regions\IViewsCollection.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\NavigationAsyncExtensions.cs" Link="Regions\NavigationAsyncExtensions.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\NavigationContext.cs" Link="Regions\NavigationContext.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\NavigationParameters.cs" Link="Regions\NavigationParameters.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\NavigationResult.cs" Link="Regions\NavigationResult.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\Region.cs" Link="Regions\Region.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionAdapterBase.cs" Link="Regions\RegionAdapterBase.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionAdapterMappings.cs" Link="Regions\RegionAdapterMappings.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionBehavior.cs" Link="Regions\RegionBehavior.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionBehaviorCollection.cs" Link="Regions\RegionBehaviorCollection.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionBehaviorFactory.cs" Link="Regions\RegionBehaviorFactory.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionContext.cs" Link="Regions\RegionContext.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionManager.cs" Link="Regions\RegionManager.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionMemberLifetimeAttribute.cs" Link="Regions\RegionMemberLifetimeAttribute.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionNavigationContentLoader.cs" Link="Regions\RegionNavigationContentLoader.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionNavigationEventArgs.cs" Link="Regions\RegionNavigationEventArgs.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionNavigationFailedEventArgs.cs" Link="Regions\RegionNavigationFailedEventArgs.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionNavigationJournal.cs" Link="Regions\RegionNavigationJournal.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionNavigationJournalEntry.cs" Link="Regions\RegionNavigationJournalEntry.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionNavigationService.cs" Link="Regions\RegionNavigationService.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\RegionViewRegistry.cs" Link="Regions\RegionViewRegistry.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\SelectorRegionAdapter.cs" Link="Regions\SelectorRegionAdapter.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\SingleActiveRegion.cs" Link="Regions\SingleActiveRegion.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\SyncActiveStateAttribute.cs" Link="Regions\SyncActiveStateAttribute.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\UpdateRegionsException.cs" Link="Regions\UpdateRegionsException.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\UpdateRegionsException.Desktop.cs" Link="Regions\UpdateRegionsException.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ViewRegisteredEventArgs.cs" Link="Regions\ViewRegisteredEventArgs.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ViewRegistrationException.cs" Link="Regions\ViewRegistrationException.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ViewRegistrationException.Desktop.cs" Link="Regions\ViewRegistrationException.Desktop.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ViewsCollection.cs" Link="Regions\ViewsCollection.cs" />
+    <Compile Include="..\..\Wpf\Prism.Wpf\Regions\ViewSortHintAttribute.cs" Link="Regions\ViewSortHintAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Wpf\Prism.Wpf\Properties\Resources.resx" Link="Properties\Resources.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Modularity\" />
+    <Folder Include="Mvvm\" />
+    <Folder Include="Properties\" />
+    <Folder Include="Regions\Behaviors\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Prism.Core\Prism.Core.csproj" />
+  </ItemGroup>
+
+	<!-- Workaround for https://github.com/microsoft/WindowsAppSDK/issues/1217 -->
+	<Target Name="FixBinPlaceBootstrapDll" BeforeTargets="BinPlaceBootstrapDll">
+		<PropertyGroup>
+			<_WindowsAppSDKFoundationPlatform>x86</_WindowsAppSDKFoundationPlatform>
+		</PropertyGroup>
+	</Target>
+</Project>

@@ -1,7 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+#if HAS_WINUI
+using Microsoft.UI.Xaml.Markup;
+
+#else
 using System.Windows.Markup;
+#endif
+
 
 namespace Prism.Modularity
 {
@@ -22,7 +28,11 @@ namespace Prism.Modularity
     /// </list>
     /// The <see cref="ModuleCatalog"/> also serves as a baseclass for more specialized Catalogs .
     /// </summary>
+#if HAS_WINUI
+    [ContentProperty(Name = nameof(Items))]
+#else
     [ContentProperty("Items")]
+#endif
     public class ModuleCatalog : ModuleCatalogBase, IModuleGroupsCatalog
     {
         /// <summary>

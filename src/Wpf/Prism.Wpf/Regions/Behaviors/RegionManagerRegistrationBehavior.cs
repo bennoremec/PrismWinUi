@@ -101,7 +101,9 @@ namespace Prism.Regions.Behaviors
         private void TryRegisterRegion()
         {
             DependencyObject targetElement = this.HostControl;
+#if !HAS_WINUI
             if (targetElement.CheckAccess())
+#endif
             {
                 IRegionManager regionManager = this.FindRegionManager(targetElement);
 

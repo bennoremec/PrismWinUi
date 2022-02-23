@@ -104,7 +104,9 @@ namespace Prism.Regions.Behaviors
                 return;
             }
 
+#if !HAS_WINUI
             if (targetElement.CheckAccess())
+#endif
             {
                 this.Detach();
 
