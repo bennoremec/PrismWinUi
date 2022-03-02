@@ -16,13 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation">
+    <PackageReference Include="Microsoft.WindowsAppSDK">
     </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI">
-    </PackageReference>
-      <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences">
-      </PackageReference>
-      <PackageReference Include="System.Configuration.ConfigurationManager" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
   </ItemGroup>
 
   <ItemGroup>
