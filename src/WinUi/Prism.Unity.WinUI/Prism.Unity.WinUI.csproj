@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Wpf\Prism.Unity.Wpf\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
-    <Compile Include="..\..\Wpf\Prism.Unity.Wpf\PrismBootstrapper.cs" Link="PrismBootstrapper.cs" />
+    <Compile Include="..\..\Wpf\Prism.Unity.Wpf\PrismApplication.cs" Link="PrismApplication.cs" />
     <Compile Include="..\..\Wpf\Prism.Unity.Wpf\Properties\Resources.Designer.cs" Link="Properties\Resources.Designer.cs" />
   </ItemGroup>
   <ItemGroup>

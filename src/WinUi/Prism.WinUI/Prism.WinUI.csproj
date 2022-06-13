@@ -44,7 +44,6 @@
     <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleTypeLoaderNotFoundException.cs" Link="Modularity\ModuleTypeLoaderNotFoundException.cs" />
     <Compile Include="..\..\Wpf\Prism.Wpf\Modularity\ModuleTypeLoaderNotFoundException.Desktop.cs" Link="Modularity\ModuleTypeLoaderNotFoundException.Desktop.cs" />
     <Compile Include="..\..\Wpf\Prism.Wpf\Mvvm\ViewModelLocator.cs" Link="Mvvm\ViewModelLocator.cs" />
-    <Compile Include="..\..\Wpf\Prism.Wpf\PrismBootstrapperBase.cs" Link="PrismBootstrapperBase.cs" />
     <Compile Include="..\..\Wpf\Prism.Wpf\PrismInitializationExtensions.cs" Link="PrismInitializationExtensions.cs" />
     <Compile Include="..\..\Wpf\Prism.Wpf\Properties\Resources.Designer.cs" Link="Properties\Resources.Designer.cs" />
     <Compile Include="..\..\Wpf\Prism.Wpf\Regions\AllActiveRegion.cs" Link="Regions\AllActiveRegion.cs" />
