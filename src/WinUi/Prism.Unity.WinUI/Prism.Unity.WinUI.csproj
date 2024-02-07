@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Prism.Unity.WinUI</RootNamespace>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DryIoc.dll"/>
     <PackageReference Include="Microsoft.WindowsAppSDK">
     </PackageReference>
     <PackageReference Include="System.Configuration.ConfigurationManager" />
@@ -25,11 +26,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Unity.Container" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Prism.WinUI\Prism.WinUI.csproj" />
   </ItemGroup>
-
-  <Import Project="..\..\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems" Label="Shared" />
+  <Import Project="..\..\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems" Label="Shared" />
 </Project>

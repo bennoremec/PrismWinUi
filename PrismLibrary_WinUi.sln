@@ -13,15 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.Unity.WinUI", "src\Wi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", "{D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Prism.Unity.Shared", "src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.shproj", "{D66336A6-07E5-401A-A710-DAEDD6975D59}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.Core", "src\Prism.Core\Prism.Core.csproj", "{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Prism.DryIoc.Shared", "src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.shproj", "{6E7EC81D-DA39-4C4F-A898-0148558C34F4}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{7f17e0f0-53b9-473f-b97e-99a911170302}*SharedItemsImports = 5
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{d66336a6-07e5-401a-a710-daedd6975d59}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -48,10 +44,14 @@ Global
 		{1338E0D9-63F3-4355-A485-16F9473E2F43} = {F73844CC-929F-4B09-9F58-A609FE4E246C}
 		{7F17E0F0-53B9-473F-B97E-99A911170302} = {F73844CC-929F-4B09-9F58-A609FE4E246C}
 		{D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58} = {D15583CB-377C-4203-9C7B-8EB794808564}
-		{D66336A6-07E5-401A-A710-DAEDD6975D59} = {D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58}
 		{741CE0CC-EE1A-4C5C-89DB-7B7ACED325CD} = {D15583CB-377C-4203-9C7B-8EB794808564}
+		{6E7EC81D-DA39-4C4F-A898-0148558C34F4} = {D8EFEA5F-B5FA-4E83-9F90-1E546A39DD58}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF540779-5D31-4280-8F83-1A80F285E076}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{6e7ec81d-da39-4c4f-a898-0148558c34f4}*SharedItemsImports = 13
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{7f17e0f0-53b9-473f-b97e-99a911170302}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
