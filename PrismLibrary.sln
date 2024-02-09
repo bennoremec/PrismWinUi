@@ -101,33 +101,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WinUi", "WinUi", "{19798124
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.WinUI", "src\WinUi\Prism.WinUI\Prism.WinUI.csproj", "{200ACD30-7BB3-4B81-ABFE-E0032F777630}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.Unity.WinUI", "src\WinUi\Prism.Unity.WinUI\Prism.Unity.WinUI.csproj", "{265B60AC-1B98-48F7-8B97-07CDAAB37597}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.DryIoc.WinUI", "src\WinUi\Prism.DryIoc.WinUI\Prism.DryIoc.WinUI.csproj", "{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{02e0ecaa-b8c6-4eab-a9ab-164b1b99af35}*SharedItemsImports = 5
-		tests\Forms\Prism.DI.Forms.Tests\Prism.DI.Forms.Tests.projitems*{089c5e84-52c3-409e-924c-bd8f4833594b}*SharedItemsImports = 5
-		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{0c8aab85-387c-41d2-abce-bafaf74b62b2}*SharedItemsImports = 5
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{265b60ac-1b98-48f7-8b97-07cdaab37597}*SharedItemsImports = 5
-		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{2d7ec81a-17b5-47c3-8ae1-619f7f8843aa}*SharedItemsImports = 5
-		tests\Containers\Prism.Container.Shared\Prism.Container.Shared.projitems*{2d7ec81a-17b5-47c3-8ae1-619f7f8843aa}*SharedItemsImports = 5
-		tests\Wpf\Prism.Container.Wpf.Shared\Prism.Container.Wpf.Shared.projitems*{367be810-5b34-4894-be47-1c8dcc67de81}*SharedItemsImports = 5
-		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{6e7ec81d-da39-4c4f-a898-0148558c34f4}*SharedItemsImports = 13
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{704e14a4-c3a2-492d-9c4e-7d386a18b698}*SharedItemsImports = 5
-		tests\Containers\Prism.Container.Shared\Prism.Container.Shared.projitems*{704e14a4-c3a2-492d-9c4e-7d386a18b698}*SharedItemsImports = 5
-		tests\Containers\Prism.Container.Shared\Prism.Container.Shared.projitems*{78932299-2281-4a59-bfb8-07de3014f748}*SharedItemsImports = 13
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{9a1c368f-30ae-4c82-be03-9168ce089b56}*SharedItemsImports = 5
-		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{aad8a958-546b-4b7d-bbd1-d79e825530eb}*SharedItemsImports = 5
-		tests\Wpf\Prism.Container.Wpf.Shared\Prism.Container.Wpf.Shared.projitems*{ba05687e-2317-4a65-805b-c596f52f7203}*SharedItemsImports = 5
-		tests\Wpf\Prism.Container.Wpf.Shared\Prism.Container.Wpf.Shared.projitems*{bd42a7d6-a84d-4d27-9c28-7f6a2ec477f1}*SharedItemsImports = 13
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{c2f58215-92f0-4501-a9f4-862c78b2b4ce}*SharedItemsImports = 5
-		tests\Forms\Prism.DI.Forms.Tests\Prism.DI.Forms.Tests.projitems*{c2ff8459-f2d1-4b87-a31a-82a1835f89cf}*SharedItemsImports = 5
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{d3611b62-8fe0-4594-a4e0-1fa0c5cd8ada}*SharedItemsImports = 5
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{d66336a6-07e5-401a-a710-daedd6975d59}*SharedItemsImports = 13
-		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{db530d15-0556-4b6f-96b2-1497c8df08d6}*SharedItemsImports = 5
-		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{e9a2458b-999d-4d36-822f-663d3830575a}*SharedItemsImports = 5
-		tests\Forms\Prism.DI.Forms.Tests\Prism.DI.Forms.Tests.projitems*{fac4fa5a-d6c1-4787-9b1f-a3ec6e2fb26e}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -449,18 +425,18 @@ Global
 		{200ACD30-7BB3-4B81-ABFE-E0032F777630}.Release|x64.Build.0 = Release|Any CPU
 		{200ACD30-7BB3-4B81-ABFE-E0032F777630}.Release|x86.ActiveCfg = Release|Any CPU
 		{200ACD30-7BB3-4B81-ABFE-E0032F777630}.Release|x86.Build.0 = Release|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Debug|x64.Build.0 = Debug|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Debug|x86.Build.0 = Debug|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Release|Any CPU.Build.0 = Release|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Release|x64.ActiveCfg = Release|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Release|x64.Build.0 = Release|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Release|x86.ActiveCfg = Release|Any CPU
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597}.Release|x86.Build.0 = Release|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Debug|x64.Build.0 = Debug|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Debug|x86.Build.0 = Debug|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Release|x64.ActiveCfg = Release|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Release|x64.Build.0 = Release|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Release|x86.ActiveCfg = Release|Any CPU
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -507,9 +483,33 @@ Global
 		{1DECC7D9-9F2A-4FF5-9FBB-A5245F1C73D7} = {F8A0FDE6-8E75-47D1-9E33-02AB8E8AB473}
 		{19798124-D2A5-48C6-A419-D2F8AC8CCDFD} = {F3664D7A-6FF5-4D1F-9F5F-26EE87F032D3}
 		{200ACD30-7BB3-4B81-ABFE-E0032F777630} = {19798124-D2A5-48C6-A419-D2F8AC8CCDFD}
-		{265B60AC-1B98-48F7-8B97-07CDAAB37597} = {19798124-D2A5-48C6-A419-D2F8AC8CCDFD}
+		{7C35C0F1-4376-499A-A8D5-8AEA33497CA7} = {19798124-D2A5-48C6-A419-D2F8AC8CCDFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C7433AE2-B1A0-4C1A-887E-5CAA7AAF67A6}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{02e0ecaa-b8c6-4eab-a9ab-164b1b99af35}*SharedItemsImports = 5
+		tests\Forms\Prism.DI.Forms.Tests\Prism.DI.Forms.Tests.projitems*{089c5e84-52c3-409e-924c-bd8f4833594b}*SharedItemsImports = 5
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{0c8aab85-387c-41d2-abce-bafaf74b62b2}*SharedItemsImports = 5
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{2d7ec81a-17b5-47c3-8ae1-619f7f8843aa}*SharedItemsImports = 5
+		tests\Containers\Prism.Container.Shared\Prism.Container.Shared.projitems*{2d7ec81a-17b5-47c3-8ae1-619f7f8843aa}*SharedItemsImports = 5
+		tests\Wpf\Prism.Container.Wpf.Shared\Prism.Container.Wpf.Shared.projitems*{367be810-5b34-4894-be47-1c8dcc67de81}*SharedItemsImports = 5
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{6e7ec81d-da39-4c4f-a898-0148558c34f4}*SharedItemsImports = 13
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{704e14a4-c3a2-492d-9c4e-7d386a18b698}*SharedItemsImports = 5
+		tests\Containers\Prism.Container.Shared\Prism.Container.Shared.projitems*{704e14a4-c3a2-492d-9c4e-7d386a18b698}*SharedItemsImports = 5
+		tests\Containers\Prism.Container.Shared\Prism.Container.Shared.projitems*{78932299-2281-4a59-bfb8-07de3014f748}*SharedItemsImports = 13
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{7c35c0f1-4376-499a-a8d5-8aea33497ca7}*SharedItemsImports = 5
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{9a1c368f-30ae-4c82-be03-9168ce089b56}*SharedItemsImports = 5
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{aad8a958-546b-4b7d-bbd1-d79e825530eb}*SharedItemsImports = 5
+		tests\Wpf\Prism.Container.Wpf.Shared\Prism.Container.Wpf.Shared.projitems*{ba05687e-2317-4a65-805b-c596f52f7203}*SharedItemsImports = 5
+		tests\Wpf\Prism.Container.Wpf.Shared\Prism.Container.Wpf.Shared.projitems*{bd42a7d6-a84d-4d27-9c28-7f6a2ec477f1}*SharedItemsImports = 13
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{c2f58215-92f0-4501-a9f4-862c78b2b4ce}*SharedItemsImports = 5
+		tests\Forms\Prism.DI.Forms.Tests\Prism.DI.Forms.Tests.projitems*{c2ff8459-f2d1-4b87-a31a-82a1835f89cf}*SharedItemsImports = 5
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{d3611b62-8fe0-4594-a4e0-1fa0c5cd8ada}*SharedItemsImports = 5
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{d66336a6-07e5-401a-a710-daedd6975d59}*SharedItemsImports = 13
+		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{db530d15-0556-4b6f-96b2-1497c8df08d6}*SharedItemsImports = 5
+		src\Containers\Prism.Unity.Shared\Prism.Unity.Shared.projitems*{e9a2458b-999d-4d36-822f-663d3830575a}*SharedItemsImports = 5
+		tests\Forms\Prism.DI.Forms.Tests\Prism.DI.Forms.Tests.projitems*{fac4fa5a-d6c1-4787-9b1f-a3ec6e2fb26e}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
