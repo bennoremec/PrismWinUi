@@ -7,6 +7,8 @@
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
 	<DefineConstants>$(DefineConstants);HAS_WINUI</DefineConstants>
     <UseWinUI>true</UseWinUI>
+    <Description>Prism.WinUI is a Fork of the Prism Library which adapts Prism.WPF functionality to WinUI</Description>
+    <EnableCoreMrtTooling Condition=" '$(BuildingInsideVisualStudio)' != 'true' ">false</EnableCoreMrtTooling>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Wpf\Prism.Wpf\Common\MvvmHelpers.cs" Link="Common\MvvmHelpers.cs" />
@@ -123,6 +125,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" />
     <PackageReference Include="System.Configuration.ConfigurationManager" />
+    <PackageReference Include="Prism.Core" />
   </ItemGroup>
 
   <ItemGroup>
@@ -132,9 +135,6 @@
     <Folder Include="Regions\Behaviors\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Prism.Core\Prism.Core.csproj" />
-  </ItemGroup>
 
 	<!-- Workaround for https://github.com/microsoft/WindowsAppSDK/issues/1217 -->
 	<Target Name="FixBinPlaceBootstrapDll" BeforeTargets="BinPlaceBootstrapDll">

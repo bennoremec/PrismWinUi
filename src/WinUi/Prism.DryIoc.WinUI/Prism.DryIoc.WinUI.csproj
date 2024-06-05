@@ -5,6 +5,8 @@
     <RootNamespace>Prism.Unity.WinUI</RootNamespace>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
+    <Description>Use these extensions to build WinUI applications with Prism and Dryloc.</Description>
+    <EnableCoreMrtTooling Condition=" '$(BuildingInsideVisualStudio)' != 'true' ">false</EnableCoreMrtTooling>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Wpf\Prism.Unity.Wpf\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
