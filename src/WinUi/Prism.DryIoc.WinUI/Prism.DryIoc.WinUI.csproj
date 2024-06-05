@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DryIoc.dll"/>
-    <PackageReference Include="Microsoft.WindowsAppSDK">
+    <PackageReference Include="DryIoc.dll" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" >
     </PackageReference>
     <PackageReference Include="System.Configuration.ConfigurationManager" />
   </ItemGroup>
