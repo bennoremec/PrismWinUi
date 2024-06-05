@@ -1,5 +1,6 @@
 ﻿using DryIoc;
 using Prism.Ioc;
+using IContainer = DryIoc.IContainer;
 
 namespace Prism.DryIoc
 {

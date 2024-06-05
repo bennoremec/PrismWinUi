@@ -3,6 +3,7 @@ using System.Linq;
 using DryIoc;
 using Prism.Ioc;
 using Prism.Ioc.Internals;
+using IContainer = DryIoc.IContainer;
 
 namespace Prism.DryIoc
 {
@@ -10,11 +11,11 @@ namespace Prism.DryIoc
     /// The <see cref="IContainerExtension" /> Implementation to use with DryIoc
     /// </summary>
 #if ContainerExtensions
-    internal partial
+    internal
 #else
     public
 #endif
-    class DryIocContainerExtension : IContainerExtension<IContainer>, IContainerInfo
+    partial class DryIocContainerExtension : IContainerExtension<IContainer>, IContainerInfo
     {
         private DryIocScopedProvider _currentScope;
 
@@ -25,9 +26,8 @@ namespace Prism.DryIoc
                                                          .With(Made.Of(FactoryMethod.ConstructorWithResolvableArguments))
                                                          .WithFuncAndLazyWithoutRegistration()
                                                          .WithTrackingDisposableTransients()
-                                                         .WithoutFastExpressionCompiler()
                                                          .WithFactorySelector(Rules.SelectLastRegisteredFactory());
-
+        
         /// <summary>
         /// The instance of the wrapped container
         /// </summary>
@@ -38,7 +38,15 @@ namespace Prism.DryIoc
         /// Constructs a default instance of the <see cref="DryIocContainerExtension" />
         /// </summary>
         public DryIocContainerExtension()
-            : this(new Container(DefaultRules))
+            : this(DefaultRules)
+        {
+        }
+
+        /// <summary>
+        /// Constructs a default instance of the <see cref="DryIocContainerExtension" />
+        /// </summary>
+        public DryIocContainerExtension(Rules rules)
+            : this(new Container(rules))
         {
         }
 
@@ -291,7 +299,11 @@ namespace Prism.DryIoc
             try
             {
                 var container = _currentScope?.Resolver ?? Instance;
-                return container.Resolve(type, args: parameters.Select(p => p.Instance).ToArray());
+                var args = parameters.Where(x => x.Instance is not IContainerProvider)
+                    .Select(x => x.Instance)
+                    .ToList();
+                args.Add(this);
+                return container.Resolve(type, args: args.ToArray());
             }
             catch (Exception ex)
             {
@@ -311,7 +323,11 @@ namespace Prism.DryIoc
             try
             {
                 var container = _currentScope?.Resolver ?? Instance;
-                return container.Resolve(type, name, args: parameters.Select(p => p.Instance).ToArray());
+                var args = parameters.Where(x => x.Instance is not IContainerProvider)
+                    .Select(x => x.Instance)
+                    .ToList();
+                args.Add(this);
+                return container.Resolve(type, name, args: args.ToArray());
             }
             catch (Exception ex)
             {
@@ -387,7 +403,7 @@ namespace Prism.DryIoc
             public IResolverContext Resolver { get; private set; }
             public IScopedProvider CurrentScope => this;
 
-            public IScopedProvider CreateScope() => this;
+            public IScopedProvider CreateScope() => new DryIocScopedProvider(Resolver.OpenScope());
 
             public void Dispose()
             {
@@ -405,7 +421,11 @@ namespace Prism.DryIoc
             {
                 try
                 {
-                    return Resolver.Resolve(type, args: parameters.Select(p => p.Instance).ToArray());
+                    var args = parameters.Where(x => x.Instance is not IContainerProvider)
+                        .Select(x => x.Instance)
+                        .ToList();
+                    args.Add(this);
+                    return Resolver.Resolve(type, args: args.ToArray());
                 }
                 catch (Exception ex)
                 {
@@ -417,7 +437,11 @@ namespace Prism.DryIoc
             {
                 try
                 {
-                    return Resolver.Resolve(type, name, args: parameters.Select(p => p.Instance).ToArray());
+                    var args = parameters.Where(x => x.Instance is not IContainerProvider)
+                        .Select(x => x.Instance)
+                        .ToList();
+                    args.Add(this);
+                    return Resolver.Resolve(type, name, args: args.ToArray());
                 }
                 catch (Exception ex)
                 {
