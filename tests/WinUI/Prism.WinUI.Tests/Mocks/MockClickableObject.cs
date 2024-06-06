@@ -1,14 +1,7 @@
+using Microsoft.UI.Xaml.Controls.Primitives;
 
+namespace Prism.WinUI.Tests.Mocks;
 
-using System.Windows.Controls.Primitives;
-
-namespace Prism.Wpf.Tests.Mocks
+internal class MockClickableObject : ButtonBase
 {
-    internal class MockClickableObject : ButtonBase
-    {
-        public void RaiseClick()
-        {
-            OnClick();
-        }
-    }
 }

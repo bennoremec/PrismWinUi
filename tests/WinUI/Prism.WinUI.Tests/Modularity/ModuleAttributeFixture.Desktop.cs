@@ -1,38 +1,34 @@
-
-
 using Prism.Modularity;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Modularity
+namespace Prism.WinUI.Tests.Modularity;
+
+public class ModuleAttributeFixture
 {
-
-    public class ModuleAttributeFixture
+    [Fact]
+    public void StartupLoadedDefaultsToTrue()
     {
-        [Fact]
-        public void StartupLoadedDefaultsToTrue()
-        {
-            var moduleAttribute = new ModuleAttribute();
+        var moduleAttribute = new ModuleAttribute();
 
-            Assert.False(moduleAttribute.OnDemand);
-        }
+        Assert.False(moduleAttribute.OnDemand);
+    }
 
-        [Fact]
-        public void CanGetAndSetProperties()
-        {
-            var moduleAttribute = new ModuleAttribute();
-            moduleAttribute.ModuleName = "Test";
-            moduleAttribute.OnDemand = true;
+    [Fact]
+    public void CanGetAndSetProperties()
+    {
+        var moduleAttribute = new ModuleAttribute();
+        moduleAttribute.ModuleName = "Test";
+        moduleAttribute.OnDemand = true;
 
-            Assert.Equal("Test", moduleAttribute.ModuleName);
-            Assert.True(moduleAttribute.OnDemand);
-        }
+        Assert.Equal("Test", moduleAttribute.ModuleName);
+        Assert.True(moduleAttribute.OnDemand);
+    }
 
-        [Fact]
-        public void ModuleDependencyAttributeStoresModuleName()
-        {
-            var moduleDependencyAttribute = new ModuleDependencyAttribute("Test");
+    [Fact]
+    public void ModuleDependencyAttributeStoresModuleName()
+    {
+        var moduleDependencyAttribute = new ModuleDependencyAttribute("Test");
 
-            Assert.Equal("Test", moduleDependencyAttribute.ModuleName);
-        }
+        Assert.Equal("Test", moduleDependencyAttribute.ModuleName);
     }
 }

@@ -1,6 +1,6 @@
 
 
-namespace Prism.Wpf.Tests.Mocks.Modules
+namespace Prism.WinUI.Tests.Mocks.Modules
 {
     public class MockReferencedModule
     {

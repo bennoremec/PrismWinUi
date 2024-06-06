@@ -1,17 +1,5 @@
-﻿using System.Windows;
+﻿namespace Prism.WinUI.Tests.Mocks;
 
-namespace Prism.Wpf.Tests.Mocks
+internal class MockFrameworkContentElement : FrameworkElement
 {
-    class MockFrameworkContentElement : FrameworkContentElement
-    {
-        public void RaiseLoaded()
-        {
-            this.RaiseEvent(new RoutedEventArgs(LoadedEvent));
-        }
-
-        public void RaiseUnloaded()
-        {
-            this.RaiseEvent(new RoutedEventArgs(UnloadedEvent));
-        }
-    }
 }

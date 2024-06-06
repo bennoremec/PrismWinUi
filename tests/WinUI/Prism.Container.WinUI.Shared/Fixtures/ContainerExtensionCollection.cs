@@ -1,11 +1,12 @@
 ﻿using Xunit;
 
-namespace Prism.Container.Wpf.Tests
-{
-    public class ContainerExtension { }
+namespace Prism.DryIoc.WinUI.Tests.Fixtures;
 
-    [CollectionDefinition(nameof(ContainerExtension), DisableParallelization = true)]
-    public class ContainerExtensionCollection : ICollectionFixture<ContainerExtension>
-    {
-    }
+public class ContainerExtension
+{
+}
+
+[CollectionDefinition(nameof(ContainerExtension), DisableParallelization = true)]
+public class ContainerExtensionCollection : ICollectionFixture<ContainerExtension>
+{
 }

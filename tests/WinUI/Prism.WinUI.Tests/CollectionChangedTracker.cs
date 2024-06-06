@@ -1,27 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Specialized;
 
-namespace Prism.Wpf.Tests
+namespace Prism.WinUI.Tests;
+
+public class CollectionChangedTracker
 {
-    public class CollectionChangedTracker
+    private readonly List<NotifyCollectionChangedEventArgs> eventList = new List<NotifyCollectionChangedEventArgs>();
+
+    public CollectionChangedTracker(INotifyCollectionChanged collection)
     {
-        private readonly List<NotifyCollectionChangedEventArgs> eventList = new List<NotifyCollectionChangedEventArgs>();
+        collection.CollectionChanged += OnCollectionChanged;
+    }
 
-        public CollectionChangedTracker(INotifyCollectionChanged collection)
-        {
-            collection.CollectionChanged += OnCollectionChanged;
-        }
+    public IEnumerable<NotifyCollectionChangedAction> ActionsFired
+    {
+        get { return this.eventList.Select(e => e.Action); }
+    }
 
-        public IEnumerable<NotifyCollectionChangedAction> ActionsFired { get { return this.eventList.Select(e => e.Action); } }
-        public IEnumerable<NotifyCollectionChangedEventArgs> NotifyEvents { get { return this.eventList; } }
+    public IEnumerable<NotifyCollectionChangedEventArgs> NotifyEvents
+    {
+        get { return this.eventList; }
+    }
 
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.eventList.Add(e);
-        }
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        this.eventList.Add(e);
     }
 }

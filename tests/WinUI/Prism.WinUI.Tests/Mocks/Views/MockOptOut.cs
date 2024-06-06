@@ -1,13 +1,11 @@
-﻿using System.Windows;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 
-namespace Prism.Wpf.Tests.Mocks.Views
+namespace Prism.WinUI.Tests.Mocks.Views;
+
+public class MockOptOut : FrameworkElement
 {
-    public class MockOptOut : FrameworkElement
+    public MockOptOut()
     {
-        public MockOptOut()
-        {
-            ViewModelLocator.SetAutoWireViewModel(this, false);
-        }
+        ViewModelLocator.SetAutoWireViewModel(this, false);
     }
 }

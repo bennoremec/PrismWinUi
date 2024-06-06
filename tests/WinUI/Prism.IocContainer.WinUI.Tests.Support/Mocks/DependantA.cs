@@ -1,20 +1,16 @@
+namespace Prism.IocContainer.WinUI.Tests.Support.Mocks;
 
-
-
-namespace Prism.IocContainer.Wpf.Tests.Support.Mocks
+public class DependantA : IDependantA
 {
-    public class DependantA : IDependantA
+    public DependantA(IDependantB dependantB)
     {
-        public DependantA(IDependantB dependantB)
-        {
-            MyDependantB = dependantB;
-        }
-
-        public IDependantB MyDependantB { get; set; }
+        MyDependantB = dependantB;
     }
 
-    public interface IDependantA
-    {
-        IDependantB MyDependantB { get; }
-    }
+    public IDependantB MyDependantB { get; set; }
+}
+
+public interface IDependantA
+{
+    IDependantB MyDependantB { get; }
 }

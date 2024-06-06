@@ -1,114 +1,106 @@
-
-
-using System;
 using Prism.Regions;
-using Prism.Wpf.Tests.Mocks;
+using Prism.WinUI.Tests.Mocks;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Regions
+namespace Prism.WinUI.Tests.Regions;
+
+public class RegionAdapterBaseFixture
 {
-
-    public class RegionAdapterBaseFixture
+    [Fact]
+    public void IncorrectTypeThrows()
     {
-        [Fact]
-        public void IncorrectTypeThrows()
-        {
-            var ex = Assert.Throws<InvalidOperationException>(() =>
-            {
-                IRegionAdapter adapter = new TestableRegionAdapterBase();
-                adapter.Initialize(new MockDependencyObject(), "Region1");
-            });
-        }
-
-        [Fact]
-        public void InitializeSetsRegionName()
+        var ex = Assert.Throws<InvalidOperationException>(() =>
         {
             IRegionAdapter adapter = new TestableRegionAdapterBase();
-            var region = adapter.Initialize(new MockRegionTarget(), "Region1");
-            Assert.Equal("Region1", region.Name);
-        }
+            adapter.Initialize(new MockDependencyObject(), "Region1");
+        });
+    }
 
-        [Fact]
-        public void NullRegionNameThrows()
+    [Fact]
+    public void InitializeSetsRegionName()
+    {
+        IRegionAdapter adapter = new TestableRegionAdapterBase();
+        var region = adapter.Initialize(new MockRegionTarget(), "Region1");
+        Assert.Equal("Region1", region.Name);
+    }
+
+    [Fact]
+    public void NullRegionNameThrows()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() =>
         {
-            var ex = Assert.Throws<ArgumentNullException>(() =>
-            {
-                IRegionAdapter adapter = new TestableRegionAdapterBase();
-                var region = adapter.Initialize(new MockRegionTarget(), null);
-            });
+            IRegionAdapter adapter = new TestableRegionAdapterBase();
+            var region = adapter.Initialize(new MockRegionTarget(), null);
+        });
+    }
 
-        }
-
-        [Fact]
-        public void NullObjectThrows()
+    [Fact]
+    public void NullObjectThrows()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() =>
         {
-            var ex = Assert.Throws<ArgumentNullException>(() =>
-            {
-                IRegionAdapter adapter = new TestableRegionAdapterBase();
-                adapter.Initialize(null, "Region1");
-            });
-
-        }
+            IRegionAdapter adapter = new TestableRegionAdapterBase();
+            adapter.Initialize(null, "Region1");
+        });
+    }
 
 
-        [Fact]
-        public void CreateRegionReturnValueIsPassedToAdapt()
-        {
-            var regionTarget = new MockRegionTarget();
-            var adapter = new TestableRegionAdapterBase();
+    [Fact]
+    public void CreateRegionReturnValueIsPassedToAdapt()
+    {
+        var regionTarget = new MockRegionTarget();
+        var adapter = new TestableRegionAdapterBase();
 
-            adapter.Initialize(regionTarget, "Region1");
+        adapter.Initialize(regionTarget, "Region1");
 
-            Assert.Same(adapter.CreateRegionReturnValue, adapter.AdaptArgumentRegion);
-            Assert.Same(regionTarget, adapter.adaptArgumentRegionTarget);
-        }
+        Assert.Same(adapter.CreateRegionReturnValue, adapter.AdaptArgumentRegion);
+        Assert.Same(regionTarget, adapter.adaptArgumentRegionTarget);
+    }
 
-        [Fact]
-        public void CreateRegionReturnValueIsPassedToAttachBehaviors()
-        {
-            var regionTarget = new MockRegionTarget();
-            var adapter = new TestableRegionAdapterBase();
+    [Fact]
+    public void CreateRegionReturnValueIsPassedToAttachBehaviors()
+    {
+        var regionTarget = new MockRegionTarget();
+        var adapter = new TestableRegionAdapterBase();
 
-            var region = adapter.Initialize(regionTarget, "Region1");
+        var region = adapter.Initialize(regionTarget, "Region1");
 
-            Assert.Same(adapter.CreateRegionReturnValue, adapter.AttachBehaviorsArgumentRegion);
-            Assert.Same(regionTarget, adapter.attachBehaviorsArgumentTargetToAdapt);
-        }
+        Assert.Same(adapter.CreateRegionReturnValue, adapter.AttachBehaviorsArgumentRegion);
+        Assert.Same(regionTarget, adapter.attachBehaviorsArgumentTargetToAdapt);
+    }
 
-        class TestableRegionAdapterBase : RegionAdapterBase<MockRegionTarget>
-        {
-            public IRegion CreateRegionReturnValue = new MockPresentationRegion();
-            public IRegion AdaptArgumentRegion;
-            public MockRegionTarget adaptArgumentRegionTarget;
-            public IRegion AttachBehaviorsArgumentRegion;
-            public MockRegionTarget attachBehaviorsArgumentTargetToAdapt;
+    private class TestableRegionAdapterBase : RegionAdapterBase<MockRegionTarget>
+    {
+        public readonly IRegion CreateRegionReturnValue = new MockPresentationRegion();
+        public IRegion AdaptArgumentRegion;
+        public MockRegionTarget adaptArgumentRegionTarget;
+        public IRegion AttachBehaviorsArgumentRegion;
+        public MockRegionTarget attachBehaviorsArgumentTargetToAdapt;
 
-            public TestableRegionAdapterBase() : base(null)
-            {
-
-            }
-
-            protected override void Adapt(IRegion region, MockRegionTarget regionTarget)
-            {
-                AdaptArgumentRegion = region;
-                adaptArgumentRegionTarget = regionTarget;
-            }
-
-            protected override IRegion CreateRegion()
-            {
-                return CreateRegionReturnValue;
-            }
-
-            protected override void AttachBehaviors(IRegion region, MockRegionTarget regionTarget)
-            {
-                AttachBehaviorsArgumentRegion = region;
-                attachBehaviorsArgumentTargetToAdapt = regionTarget;
-                base.AttachBehaviors(region, regionTarget);
-            }
-        }
-
-        class MockRegionTarget
+        public TestableRegionAdapterBase() : base(null)
         {
         }
+
+        protected override void Adapt(IRegion region, MockRegionTarget regionTarget)
+        {
+            AdaptArgumentRegion = region;
+            adaptArgumentRegionTarget = regionTarget;
+        }
+
+        protected override IRegion CreateRegion()
+        {
+            return CreateRegionReturnValue;
+        }
+
+        protected override void AttachBehaviors(IRegion region, MockRegionTarget regionTarget)
+        {
+            AttachBehaviorsArgumentRegion = region;
+            attachBehaviorsArgumentTargetToAdapt = regionTarget;
+            base.AttachBehaviors(region, regionTarget);
+        }
+    }
+
+    private class MockRegionTarget
+    {
     }
 }

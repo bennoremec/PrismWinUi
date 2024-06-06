@@ -1,29 +1,27 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
-namespace Prism.Wpf.Tests
+namespace Prism.WinUI.Tests;
+
+public static class ExceptionAssert
 {
-    public static class ExceptionAssert
+    public static void Throws<TException>(Action action)
+        where TException : Exception
     {
-        public static void Throws<TException>(Action action)
-            where TException : Exception
+        Throws(typeof(TException), action);
+    }
+
+    public static void Throws(Type expectedExceptionType, Action action)
+    {
+        try
         {
-            Throws(typeof(TException), action);
+            action();
+        }
+        catch (Exception ex)
+        {
+            Assert.IsType(expectedExceptionType, ex);
+            return;
         }
 
-        public static void Throws(Type expectedExceptionType, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsType(expectedExceptionType, ex);
-                return;
-            }
-
-            //Assert.Fail("No exception thrown.  Expected exception type of {0}.", expectedExceptionType.Name);
-        }
+        //Assert.Fail("No exception thrown.  Expected exception type of {0}.", expectedExceptionType.Name);
     }
 }

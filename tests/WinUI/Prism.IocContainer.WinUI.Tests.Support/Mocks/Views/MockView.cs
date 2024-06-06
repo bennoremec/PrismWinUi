@@ -1,8 +1,7 @@
-﻿using System.Windows;
+﻿using Microsoft.UI.Xaml;
 
-namespace Prism.IocContainer.Wpf.Tests.Support.Mocks.Views
+namespace Prism.IocContainer.WinUI.Tests.Support.Mocks.Views;
+
+public class MockView : FrameworkElement
 {
-    public class MockView : FrameworkElement
-    {
-    }
 }

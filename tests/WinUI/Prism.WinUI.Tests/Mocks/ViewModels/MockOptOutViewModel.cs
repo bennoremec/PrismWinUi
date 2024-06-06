@@ -1,8 +1,7 @@
 ﻿using Prism.Mvvm;
 
-namespace Prism.Wpf.Tests.Mocks.ViewModels
+namespace Prism.WinUI.Tests.Mocks.ViewModels;
+
+public class MockOptOutViewModel : BindableBase
 {
-    public class MockOptOutViewModel : BindableBase
-    {
-    }
 }

@@ -1,21 +1,18 @@
-
-
 using Prism.Modularity;
 
-namespace Prism.Wpf.Tests.Mocks
+namespace Prism.WinUI.Tests.Mocks;
+
+public class MockConfigurationStore : IConfigurationStore
 {
-    public class MockConfigurationStore : IConfigurationStore
+    private readonly ModulesConfigurationSection _section = new ModulesConfigurationSection();
+
+    public ModuleConfigurationElement[] Modules
     {
-        private ModulesConfigurationSection _section = new ModulesConfigurationSection();
+        set { _section.Modules = new ModuleConfigurationElementCollection(value); }
+    }
 
-        public ModuleConfigurationElement[] Modules
-        {
-            set { _section.Modules = new ModuleConfigurationElementCollection(value); }
-        }
-
-        public ModulesConfigurationSection RetrieveModuleConfigurationSection()
-        {
-            return _section;
-        }
+    public ModulesConfigurationSection RetrieveModuleConfigurationSection()
+    {
+        return _section;
     }
 }

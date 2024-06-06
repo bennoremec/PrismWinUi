@@ -1,1195 +1,1183 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
 using Moq;
 using Prism.Ioc;
 using Prism.Regions;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Regions
+namespace Prism.WinUI.Tests.Regions;
+
+public class RegionNavigationServiceFixture
 {
-
-    public class RegionNavigationServiceFixture
+    [Fact]
+    public void WhenNavigating_ViewIsActivated()
     {
-        [Fact]
-        public void WhenNavigating_ViewIsActivated()
+        // Prepare
+        var view = new object();
+        var viewUri = new Uri(view.GetType().Name, UriKind.Relative);
+
+        IRegion region = new Region();
+        region.Add(view);
+
+        var regionName = "RegionName";
+        var regionManager = new RegionManager();
+        regionManager.Regions.Add(regionName, region);
+
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            object view = new object();
-            Uri viewUri = new Uri(view.GetType().Name, UriKind.Relative);
+            Region = region,
+        };
 
-            IRegion region = new Region();
-            region.Add(view);
+        // Act
+        var isNavigationSuccessful = false;
+        target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
 
-            string regionName = "RegionName";
-            RegionManager regionManager = new RegionManager();
-            regionManager.Regions.Add(regionName, region);
+        // Verify
+        Assert.True(isNavigationSuccessful);
+        var isViewActive = region.ActiveViews.Contains(view);
+        Assert.True(isViewActive);
+    }
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+    [Fact]
+    public void WhenNavigatingWithQueryString_ViewIsActivated()
+    {
+        // Prepare
+        var view = new object();
+        var viewUri = new Uri(view.GetType().Name + "?MyQuery=true", UriKind.Relative);
 
-            var container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        IRegion region = new Region();
+        region.Add(view);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var regionName = "RegionName";
+        var regionManager = new RegionManager();
+        regionManager.Regions.Add(regionName, region);
 
-            // Act
-            bool isNavigationSuccessful = false;
-            target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            // Verify
-            Assert.True(isNavigationSuccessful);
-            bool isViewActive = region.ActiveViews.Contains(view);
-            Assert.True(isViewActive);
-        }
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-        [Fact]
-        public void WhenNavigatingWithQueryString_ViewIsActivated()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            object view = new object();
-            Uri viewUri = new Uri(view.GetType().Name + "?MyQuery=true", UriKind.Relative);
+            Region = region,
+        };
 
-            IRegion region = new Region();
-            region.Add(view);
+        // Act
+        var isNavigationSuccessful = false;
+        target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
 
-            string regionName = "RegionName";
-            RegionManager regionManager = new RegionManager();
-            regionManager.Regions.Add(regionName, region);
+        // Verify
+        Assert.True(isNavigationSuccessful);
+        var isViewActive = region.ActiveViews.Contains(view);
+        Assert.True(isViewActive);
+    }
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+    [Fact]
+    public void WhenNavigatingAndViewCannotBeAcquired_ThenNavigationResultHasError()
+    {
+        // Prepare
+        var view = new object();
+        var viewUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        IRegion region = new Region();
+        region.Add(view);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var otherType = "OtherType";
 
-            // Act
-            bool isNavigationSuccessful = false;
-            target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var container = containerMock.Object;
 
-            // Verify
-            Assert.True(isNavigationSuccessful);
-            bool isViewActive = region.ActiveViews.Contains(view);
-            Assert.True(isViewActive);
-        }
+        var targetHandlerMock = new Mock<IRegionNavigationContentLoader>();
+        targetHandlerMock.Setup(th => th.LoadContent(It.IsAny<IRegion>(), It.IsAny<NavigationContext>())).Throws<ArgumentException>();
 
-        [Fact]
-        public void WhenNavigatingAndViewCannotBeAcquired_ThenNavigationResultHasError()
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, targetHandlerMock.Object, journal)
         {
-            // Prepare
-            object view = new object();
-            Uri viewUri = new Uri(view.GetType().Name, UriKind.Relative);
+            Region = region,
+        };
 
-            IRegion region = new Region();
-            region.Add(view);
+        // Act
+        Exception error = null;
+        target.RequestNavigate(
+            new Uri(otherType.GetType().Name, UriKind.Relative),
+            nr => { error = nr.Error; });
 
-            string otherType = "OtherType";
+        // Verify
+        var isViewActive = region.ActiveViews.Contains(view);
+        Assert.False(isViewActive);
+        Assert.IsType<ArgumentException>(error);
+    }
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
-            IContainerExtension container = containerMock.Object;
+    [Fact]
+    public void WhenNavigatingWithNullUri_Throws()
+    {
+        // Prepare
+        IRegion region = new Region();
 
-            Mock<IRegionNavigationContentLoader> targetHandlerMock = new Mock<IRegionNavigationContentLoader>();
-            targetHandlerMock.Setup(th => th.LoadContent(It.IsAny<IRegion>(), It.IsAny<NavigationContext>())).Throws<ArgumentException>();
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            RegionNavigationService target = new RegionNavigationService(container, targetHandlerMock.Object, journal)
-            {
-                Region = region
-            };
-
-            // Act
-            Exception error = null;
-            target.RequestNavigate(
-                new Uri(otherType.GetType().Name, UriKind.Relative),
-                nr =>
-                {
-                    error = nr.Error;
-                });
-
-            // Verify
-            bool isViewActive = region.ActiveViews.Contains(view);
-            Assert.False(isViewActive);
-            Assert.IsType<ArgumentException>(error);
-        }
-
-        [Fact]
-        public void WhenNavigatingWithNullUri_Throws()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            IRegion region = new Region();
+            Region = region,
+        };
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        // Act
+        NavigationResult navigationResult = null;
+        target.RequestNavigate((Uri) null, nr => navigationResult = nr);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        // Verify
+        Assert.False(navigationResult.Result.Value);
+        Assert.NotNull(navigationResult.Error);
+        Assert.IsType<ArgumentNullException>(navigationResult.Error);
+    }
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+    [Fact]
+    public void WhenNavigatingAndViewImplementsINavigationAware_ThenNavigatedIsInvokedOnNavigation()
+    {
+        // Prepare
+        var region = new Region();
 
-            // Act
-            NavigationResult navigationResult = null;
-            target.RequestNavigate((Uri)null, nr => navigationResult = nr);
+        var viewMock = new Mock<INavigationAware>();
+        viewMock.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
+        var view = viewMock.Object;
+        region.Add(view);
 
-            // Verify
-            Assert.False(navigationResult.Result.Value);
-            Assert.NotNull(navigationResult.Error);
-            Assert.IsType<ArgumentNullException>(navigationResult.Error);
-        }
+        var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-        [Fact]
-        public void WhenNavigatingAndViewImplementsINavigationAware_ThenNavigatedIsInvokedOnNavigation()
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var viewMock = new Mock<INavigationAware>();
-            viewMock.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
-            var view = viewMock.Object;
-            region.Add(view);
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
+        // Verify
+        viewMock.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri && nc.NavigationService == target)));
+    }
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+    [StaFact]
+    public void WhenNavigatingAndDataContextImplementsINavigationAware_ThenNavigatedIsInvokesOnNavigation()
+    {
+        // Prepare
+        var region = new Region();
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var mockFrameworkElement = new Mock<FrameworkElement>();
+        var mockINavigationAwareDataContext = new Mock<INavigationAware>();
+        mockINavigationAwareDataContext.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
+        mockFrameworkElement.Object.DataContext = mockINavigationAwareDataContext.Object;
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var view = mockFrameworkElement.Object;
+        region.Add(view);
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            // Verify
-            viewMock.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri && nc.NavigationService == target)));
-        }
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-        [StaFact]
-        public void WhenNavigatingAndDataContextImplementsINavigationAware_ThenNavigatedIsInvokesOnNavigation()
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            Mock<FrameworkElement> mockFrameworkElement = new Mock<FrameworkElement>();
-            Mock<INavigationAware> mockINavigationAwareDataContext = new Mock<INavigationAware>();
-            mockINavigationAwareDataContext.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
-            mockFrameworkElement.Object.DataContext = mockINavigationAwareDataContext.Object;
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            var view = mockFrameworkElement.Object;
-            region.Add(view);
+        // Verify
+        mockINavigationAwareDataContext.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri)));
+    }
 
-            var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
+    [StaFact]
+    public void WhenNavigatingAndBothViewAndDataContextImplementINavigationAware_ThenNavigatedIsInvokesOnNavigation()
+    {
+        // Prepare
+        var region = new Region();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var mockFrameworkElement = new Mock<FrameworkElement>();
+        var mockINavigationAwareView = mockFrameworkElement.As<INavigationAware>();
+        mockINavigationAwareView.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var mockINavigationAwareDataContext = new Mock<INavigationAware>();
+        mockINavigationAwareDataContext.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
+        mockFrameworkElement.Object.DataContext = mockINavigationAwareDataContext.Object;
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var view = mockFrameworkElement.Object;
+        region.Add(view);
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            // Verify
-            mockINavigationAwareDataContext.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri)));
-        }
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-        [StaFact]
-        public void WhenNavigatingAndBothViewAndDataContextImplementINavigationAware_ThenNavigatedIsInvokesOnNavigation()
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            Mock<FrameworkElement> mockFrameworkElement = new Mock<FrameworkElement>();
-            Mock<INavigationAware> mockINavigationAwareView = mockFrameworkElement.As<INavigationAware>();
-            mockINavigationAwareView.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            Mock<INavigationAware> mockINavigationAwareDataContext = new Mock<INavigationAware>();
-            mockINavigationAwareDataContext.Setup(ina => ina.IsNavigationTarget(It.IsAny<NavigationContext>())).Returns(true);
-            mockFrameworkElement.Object.DataContext = mockINavigationAwareDataContext.Object;
+        // Verify
+        mockINavigationAwareView.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri)));
+        mockINavigationAwareDataContext.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri)));
+    }
 
-            var view = mockFrameworkElement.Object;
-            region.Add(view);
+    [Fact]
+    public void WhenNavigating_NavigationIsRecordedInJournal()
+    {
+        // Prepare
+        var view = new object();
+        var viewUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
+        IRegion region = new Region();
+        region.Add(view);
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var regionName = "RegionName";
+        var regionManager = new RegionManager();
+        regionManager.Regions.Add(regionName, region);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        IRegionNavigationJournalEntry journalEntry = new RegionNavigationJournalEntry();
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(journalEntry);
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
 
-            // Verify
-            mockINavigationAwareView.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri)));
-            mockINavigationAwareDataContext.Verify(v => v.OnNavigatedTo(It.Is<NavigationContext>(nc => nc.Uri == navigationUri)));
-        }
+        var journalMock = new Mock<IRegionNavigationJournal>();
+        journalMock.Setup(x => x.RecordNavigation(journalEntry, true)).Verifiable();
 
-        [Fact]
-        public void WhenNavigating_NavigationIsRecordedInJournal()
+        var journal = journalMock.Object;
+
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            object view = new object();
-            Uri viewUri = new Uri(view.GetType().Name, UriKind.Relative);
+            Region = region,
+        };
 
-            IRegion region = new Region();
-            region.Add(view);
+        // Act
+        target.RequestNavigate(viewUri, nr => { });
 
-            string regionName = "RegionName";
-            RegionManager regionManager = new RegionManager();
-            regionManager.Regions.Add(regionName, region);
+        // Verify
+        Assert.NotNull(journalEntry);
+        Assert.Equal(viewUri, journalEntry.Uri);
+        journalMock.VerifyAll();
+    }
 
-            IRegionNavigationJournalEntry journalEntry = new RegionNavigationJournalEntry();
+    [Fact]
+    public void WhenNavigatingAndCurrentlyActiveViewImplementsINavigateWithVeto_ThenNavigationRequestQueriesForVeto()
+    {
+        // Prepare
+        var region = new Region();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(journalEntry);
+        var viewMock = new Mock<IConfirmNavigationRequest>();
+        viewMock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Verifiable();
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
+        var view = viewMock.Object;
+        region.Add(view);
+        region.Activate(view);
 
-            var journalMock = new Mock<IRegionNavigationJournal>();
-            journalMock.Setup(x => x.RecordNavigation(journalEntry, true)).Verifiable();
+        var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            IRegionNavigationJournal journal = journalMock.Object;
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
-
-            // Act
-            target.RequestNavigate(viewUri, nr => { });
-
-            // Verify
-            Assert.NotNull(journalEntry);
-            Assert.Equal(viewUri, journalEntry.Uri);
-            journalMock.VerifyAll();
-        }
-
-        [Fact]
-        public void WhenNavigatingAndCurrentlyActiveViewImplementsINavigateWithVeto_ThenNavigationRequestQueriesForVeto()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var viewMock = new Mock<IConfirmNavigationRequest>();
-            viewMock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Verifiable();
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            var view = viewMock.Object;
-            region.Add(view);
-            region.Activate(view);
+        // Verify
+        viewMock.VerifyAll();
+    }
 
-            var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
+    [Fact]
+    public void WhenNavigating_ThenNavigationRequestQueriesForVetoOnAllActiveViewsIfAllSucceed()
+    {
+        // Prepare
+        var region = new Region();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var view1Mock = new Mock<IConfirmNavigationRequest>();
+        view1Mock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
+            .Verifiable();
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var view1 = view1Mock.Object;
+        region.Add(view1);
+        region.Activate(view1);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var view2Mock = new Mock<IConfirmNavigationRequest>();
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        var view2 = view2Mock.Object;
+        region.Add(view2);
 
-            // Verify
-            viewMock.VerifyAll();
-        }
+        var view3Mock = new Mock<INavigationAware>();
 
-        [Fact]
-        public void WhenNavigating_ThenNavigationRequestQueriesForVetoOnAllActiveViewsIfAllSucceed()
+        var view3 = view3Mock.Object;
+        region.Add(view3);
+        region.Activate(view3);
+
+        var view4Mock = new Mock<IConfirmNavigationRequest>();
+        view4Mock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
+            .Verifiable();
+
+        var view4 = view4Mock.Object;
+        region.Add(view4);
+        region.Activate(view4);
+
+        var navigationUri = new Uri(view1.GetType().Name, UriKind.Relative);
+
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var view1Mock = new Mock<IConfirmNavigationRequest>();
-            view1Mock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
-                .Verifiable();
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            var view1 = view1Mock.Object;
-            region.Add(view1);
-            region.Activate(view1);
+        // Verify
+        view1Mock.VerifyAll();
+        view2Mock.Verify(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()), Times.Never());
+        view3Mock.VerifyAll();
+        view4Mock.VerifyAll();
+    }
 
-            var view2Mock = new Mock<IConfirmNavigationRequest>();
+    [Fact]
+    public void WhenRequestNavigateAwayAcceptsThroughCallback_ThenNavigationProceeds()
+    {
+        // Prepare
+        var region = new Region();
 
-            var view2 = view2Mock.Object;
-            region.Add(view2);
+        var view1Mock = new Mock<IConfirmNavigationRequest>();
+        view1Mock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
+            .Verifiable();
 
-            var view3Mock = new Mock<INavigationAware>();
+        var view1 = view1Mock.Object;
 
-            var view3 = view3Mock.Object;
-            region.Add(view3);
-            region.Activate(view3);
+        var view2 = new object();
 
-            var view4Mock = new Mock<IConfirmNavigationRequest>();
-            view4Mock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
-                .Verifiable();
+        region.Add(view1);
+        region.Add(view2);
 
-            var view4 = view4Mock.Object;
-            region.Add(view4);
-            region.Activate(view4);
+        region.Activate(view1);
 
-            var navigationUri = new Uri(view1.GetType().Name, UriKind.Relative);
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
-
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
-
-            // Verify
-            view1Mock.VerifyAll();
-            view2Mock.Verify(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()), Times.Never());
-            view3Mock.VerifyAll();
-            view4Mock.VerifyAll();
-        }
-
-        [Fact]
-        public void WhenRequestNavigateAwayAcceptsThroughCallback_ThenNavigationProceeds()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var view1Mock = new Mock<IConfirmNavigationRequest>();
-            view1Mock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
-                .Verifiable();
+        // Act
+        var navigationSucceeded = false;
+        target.RequestNavigate(navigationUri, nr => { navigationSucceeded = nr.Result == true; });
 
-            var view1 = view1Mock.Object;
+        // Verify
+        view1Mock.VerifyAll();
+        Assert.True(navigationSucceeded);
+        Assert.Equal(new object[] { view1, view2 }, region.ActiveViews.ToArray());
+    }
 
-            var view2 = new object();
+    [Fact]
+    public void WhenRequestNavigateAwayRejectsThroughCallback_ThenNavigationDoesNotProceed()
+    {
+        // Prepare
+        var region = new Region();
 
-            region.Add(view1);
-            region.Add(view2);
+        var view1Mock = new Mock<IConfirmNavigationRequest>();
+        view1Mock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
+            .Verifiable();
 
-            region.Activate(view1);
+        var view1 = view1Mock.Object;
 
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+        var view2 = new object();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        region.Add(view1);
+        region.Add(view2);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        region.Activate(view1);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
 
-            // Act
-            var navigationSucceeded = false;
-            target.RequestNavigate(navigationUri, nr => { navigationSucceeded = nr.Result == true; });
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            // Verify
-            view1Mock.VerifyAll();
-            Assert.True(navigationSucceeded);
-            Assert.Equal(new object[] { view1, view2 }, region.ActiveViews.ToArray());
-        }
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-        [Fact]
-        public void WhenRequestNavigateAwayRejectsThroughCallback_ThenNavigationDoesNotProceed()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var view1Mock = new Mock<IConfirmNavigationRequest>();
-            view1Mock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
-                .Verifiable();
+        // Act
+        var navigationFailed = false;
+        target.RequestNavigate(navigationUri, nr => { navigationFailed = nr.Result == false; });
 
-            var view1 = view1Mock.Object;
+        // Verify
+        view1Mock.VerifyAll();
+        Assert.True(navigationFailed);
+        Assert.Equal(new object[] { view1 }, region.ActiveViews.ToArray());
+    }
 
-            var view2 = new object();
+    [StaFact]
+    public void WhenNavigatingAndDataContextOnCurrentlyActiveViewImplementsINavigateWithVeto_ThenNavigationRequestQueriesForVeto()
+    {
+        // Prepare
+        var region = new Region();
 
-            region.Add(view1);
-            region.Add(view2);
+        var viewModelMock = new Mock<IConfirmNavigationRequest>();
+        viewModelMock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Verifiable();
 
-            region.Activate(view1);
+        var viewMock = new Mock<FrameworkElement>();
 
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+        var view = viewMock.Object;
+        view.DataContext = viewModelMock.Object;
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        region.Add(view);
+        region.Activate(view);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            // Act
-            var navigationFailed = false;
-            target.RequestNavigate(navigationUri, nr => { navigationFailed = nr.Result == false; });
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            // Verify
-            view1Mock.VerifyAll();
-            Assert.True(navigationFailed);
-            Assert.Equal(new object[] { view1 }, region.ActiveViews.ToArray());
-        }
-
-        [StaFact]
-        public void WhenNavigatingAndDataContextOnCurrentlyActiveViewImplementsINavigateWithVeto_ThenNavigationRequestQueriesForVeto()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var viewModelMock = new Mock<IConfirmNavigationRequest>();
-            viewModelMock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Verifiable();
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            var viewMock = new Mock<FrameworkElement>();
+        // Verify
+        viewModelMock.VerifyAll();
+    }
 
-            var view = viewMock.Object;
-            view.DataContext = viewModelMock.Object;
+    [StaFact]
+    public void WhenRequestNavigateAwayOnDataContextAcceptsThroughCallback_ThenNavigationProceeds()
+    {
+        // Prepare
+        var region = new Region();
 
-            region.Add(view);
-            region.Activate(view);
+        var view1DataContextMock = new Mock<IConfirmNavigationRequest>();
+        view1DataContextMock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
+            .Verifiable();
 
-            var navigationUri = new Uri(view.GetType().Name, UriKind.Relative);
+        var view1Mock = new Mock<FrameworkElement>();
+        var view1 = view1Mock.Object;
+        view1.DataContext = view1DataContextMock.Object;
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var view2 = new object();
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        region.Add(view1);
+        region.Add(view2);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        region.Activate(view1);
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
 
-            // Verify
-            viewModelMock.VerifyAll();
-        }
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-        [StaFact]
-        public void WhenRequestNavigateAwayOnDataContextAcceptsThroughCallback_ThenNavigationProceeds()
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var view1DataContextMock = new Mock<IConfirmNavigationRequest>();
-            view1DataContextMock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(true))
-                .Verifiable();
+        // Act
+        var navigationSucceeded = false;
+        target.RequestNavigate(navigationUri, nr => { navigationSucceeded = nr.Result == true; });
 
-            var view1Mock = new Mock<FrameworkElement>();
-            var view1 = view1Mock.Object;
-            view1.DataContext = view1DataContextMock.Object;
+        // Verify
+        view1DataContextMock.VerifyAll();
+        Assert.True(navigationSucceeded);
+        Assert.Equal(new object[] { view1, view2 }, region.ActiveViews.ToArray());
+    }
 
-            var view2 = new object();
+    [StaFact]
+    public void WhenRequestNavigateAwayOnDataContextRejectsThroughCallback_ThenNavigationDoesNotProceed()
+    {
+        // Prepare
+        var region = new Region();
 
-            region.Add(view1);
-            region.Add(view2);
+        var view1DataContextMock = new Mock<IConfirmNavigationRequest>();
+        view1DataContextMock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
+            .Verifiable();
 
-            region.Activate(view1);
+        var view1Mock = new Mock<FrameworkElement>();
+        var view1 = view1Mock.Object;
+        view1.DataContext = view1DataContextMock.Object;
 
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+        var view2 = new object();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        region.Add(view1);
+        region.Add(view2);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        region.Activate(view1);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
 
-            // Act
-            var navigationSucceeded = false;
-            target.RequestNavigate(navigationUri, nr => { navigationSucceeded = nr.Result == true; });
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            // Verify
-            view1DataContextMock.VerifyAll();
-            Assert.True(navigationSucceeded);
-            Assert.Equal(new object[] { view1, view2 }, region.ActiveViews.ToArray());
-        }
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-        [StaFact]
-        public void WhenRequestNavigateAwayOnDataContextRejectsThroughCallback_ThenNavigationDoesNotProceed()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region();
+            Region = region,
+        };
 
-            var view1DataContextMock = new Mock<IConfirmNavigationRequest>();
-            view1DataContextMock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
-                .Verifiable();
+        // Act
+        var navigationFailed = false;
+        target.RequestNavigate(navigationUri, nr => { navigationFailed = nr.Result == false; });
 
-            var view1Mock = new Mock<FrameworkElement>();
-            var view1 = view1Mock.Object;
-            view1.DataContext = view1DataContextMock.Object;
+        // Verify
+        view1DataContextMock.VerifyAll();
+        Assert.True(navigationFailed);
+        Assert.Equal(new object[] { view1 }, region.ActiveViews.ToArray());
+    }
 
-            var view2 = new object();
+    [Fact]
+    public void WhenViewAcceptsNavigationOutAfterNewIncomingRequestIsReceived_ThenOriginalRequestIsIgnored()
+    {
+        var region = new Region();
 
-            region.Add(view1);
-            region.Add(view2);
+        var viewMock = new Mock<IConfirmNavigationRequest>();
+        var view = viewMock.Object;
 
-            region.Activate(view1);
+        var confirmationRequests = new List<Action<bool>>();
 
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+        viewMock
+            .Setup(icnr => icnr.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => { confirmationRequests.Add(c); });
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        region.Add(view);
+        region.Activate(view);
 
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var navigationUri = new Uri("", UriKind.Relative);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock
+            .Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry)))
+            .Returns(new RegionNavigationJournalEntry());
 
-            // Act
-            var navigationFailed = false;
-            target.RequestNavigate(navigationUri, nr => { navigationFailed = nr.Result == false; });
+        var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
+        contentLoaderMock
+            .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
+            .Returns(view);
 
-            // Verify
-            view1DataContextMock.VerifyAll();
-            Assert.True(navigationFailed);
-            Assert.Equal(new object[] { view1 }, region.ActiveViews.ToArray());
-        }
+        var container = containerMock.Object;
+        var contentLoader = contentLoaderMock.Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-        [Fact]
-        public void WhenViewAcceptsNavigationOutAfterNewIncomingRequestIsReceived_ThenOriginalRequestIsIgnored()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            var region = new Region();
+            Region = region,
+        };
 
-            var viewMock = new Mock<IConfirmNavigationRequest>();
-            var view = viewMock.Object;
+        var firstNavigation = false;
+        var secondNavigation = false;
+        target.RequestNavigate(navigationUri, nr => firstNavigation = nr.Result.Value);
+        target.RequestNavigate(navigationUri, nr => secondNavigation = nr.Result.Value);
 
-            var confirmationRequests = new List<Action<bool>>();
+        Assert.Equal(2, confirmationRequests.Count);
 
-            viewMock
-                .Setup(icnr => icnr.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => { confirmationRequests.Add(c); });
+        confirmationRequests[0](true);
+        confirmationRequests[1](true);
 
-            region.Add(view);
-            region.Activate(view);
+        Assert.False(firstNavigation);
+        Assert.True(secondNavigation);
+    }
 
-            var navigationUri = new Uri("", UriKind.Relative);
+    [StaFact]
+    public void WhenViewModelAcceptsNavigationOutAfterNewIncomingRequestIsReceived_ThenOriginalRequestIsIgnored()
+    {
+        var region = new Region();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock
-                .Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry)))
-                .Returns(new RegionNavigationJournalEntry());
+        var viewModelMock = new Mock<IConfirmNavigationRequest>();
 
-            var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
-            contentLoaderMock
-                .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
-                .Returns(view);
+        var viewMock = new Mock<FrameworkElement>();
+        var view = viewMock.Object;
+        view.DataContext = viewModelMock.Object;
 
-            var container = containerMock.Object;
-            var contentLoader = contentLoaderMock.Object;
-            var journal = new Mock<IRegionNavigationJournal>().Object;
+        var confirmationRequests = new List<Action<bool>>();
 
-            var target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        viewModelMock
+            .Setup(icnr => icnr.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => { confirmationRequests.Add(c); });
 
-            bool firstNavigation = false;
-            bool secondNavigation = false;
-            target.RequestNavigate(navigationUri, nr => firstNavigation = nr.Result.Value);
-            target.RequestNavigate(navigationUri, nr => secondNavigation = nr.Result.Value);
+        region.Add(view);
+        region.Activate(view);
 
-            Assert.Equal(2, confirmationRequests.Count);
+        var navigationUri = new Uri("", UriKind.Relative);
 
-            confirmationRequests[0](true);
-            confirmationRequests[1](true);
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock
+            .Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry)))
+            .Returns(new RegionNavigationJournalEntry());
 
-            Assert.False(firstNavigation);
-            Assert.True(secondNavigation);
-        }
+        var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
+        contentLoaderMock
+            .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
+            .Returns(view);
 
-        [StaFact]
-        public void WhenViewModelAcceptsNavigationOutAfterNewIncomingRequestIsReceived_ThenOriginalRequestIsIgnored()
+        var container = containerMock.Object;
+        var contentLoader = contentLoaderMock.Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            var region = new Region();
+            Region = region,
+        };
 
-            var viewModelMock = new Mock<IConfirmNavigationRequest>();
+        var firstNavigation = false;
+        var secondNavigation = false;
+        target.RequestNavigate(navigationUri, nr => firstNavigation = nr.Result.Value);
+        target.RequestNavigate(navigationUri, nr => secondNavigation = nr.Result.Value);
 
-            var viewMock = new Mock<FrameworkElement>();
-            var view = viewMock.Object;
-            view.DataContext = viewModelMock.Object;
+        Assert.Equal(2, confirmationRequests.Count);
 
-            var confirmationRequests = new List<Action<bool>>();
+        confirmationRequests[0](true);
+        confirmationRequests[1](true);
 
-            viewModelMock
-                .Setup(icnr => icnr.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => { confirmationRequests.Add(c); });
+        Assert.False(firstNavigation);
+        Assert.True(secondNavigation);
+    }
 
-            region.Add(view);
-            region.Activate(view);
+    [Fact]
+    public void BeforeNavigating_NavigatingEventIsRaised()
+    {
+        // Prepare
+        var view = new object();
+        var viewUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-            var navigationUri = new Uri("", UriKind.Relative);
+        IRegion region = new Region();
+        region.Add(view);
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock
-                .Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry)))
-                .Returns(new RegionNavigationJournalEntry());
+        var regionName = "RegionName";
+        var regionManager = new RegionManager();
+        regionManager.Regions.Add(regionName, region);
 
-            var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
-            contentLoaderMock
-                .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
-                .Returns(view);
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            var container = containerMock.Object;
-            var contentLoader = contentLoaderMock.Object;
-            var journal = new Mock<IRegionNavigationJournal>().Object;
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            var target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
-
-            bool firstNavigation = false;
-            bool secondNavigation = false;
-            target.RequestNavigate(navigationUri, nr => firstNavigation = nr.Result.Value);
-            target.RequestNavigate(navigationUri, nr => secondNavigation = nr.Result.Value);
-
-            Assert.Equal(2, confirmationRequests.Count);
-
-            confirmationRequests[0](true);
-            confirmationRequests[1](true);
-
-            Assert.False(firstNavigation);
-            Assert.True(secondNavigation);
-        }
-
-        [Fact]
-        public void BeforeNavigating_NavigatingEventIsRaised()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            object view = new object();
-            Uri viewUri = new Uri(view.GetType().Name, UriKind.Relative);
+            Region = region,
+        };
 
-            IRegion region = new Region();
-            region.Add(view);
-
-            string regionName = "RegionName";
-            RegionManager regionManager = new RegionManager();
-            regionManager.Regions.Add(regionName, region);
-
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
-
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
-
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
-
-            bool isNavigatingRaised = false;
-            target.Navigating += delegate (object sender, RegionNavigationEventArgs e)
-            {
-                if (sender == target)
-                {
-                    isNavigatingRaised = true;
-                }
-            };
-
-            // Act
-            bool isNavigationSuccessful = false;
-            target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
-
-            // Verify
-            Assert.True(isNavigationSuccessful);
-            Assert.True(isNavigatingRaised);
-        }
-
-        [Fact]
-        public void WhenNavigationSucceeds_NavigatedIsRaised()
+        var isNavigatingRaised = false;
+        target.Navigating += delegate(object sender, RegionNavigationEventArgs e)
         {
-            // Prepare
-            object view = new object();
-            Uri viewUri = new Uri(view.GetType().Name, UriKind.Relative);
-
-            IRegion region = new Region();
-            region.Add(view);
-
-            string regionName = "RegionName";
-            RegionManager regionManager = new RegionManager();
-            regionManager.Regions.Add(regionName, region);
-
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
-
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new RegionNavigationContentLoader(container);
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
-
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
+            if (sender == target)
             {
-                Region = region
-            };
+                isNavigatingRaised = true;
+            }
+        };
 
-            bool isNavigatedRaised = false;
-            target.Navigated += delegate (object sender, RegionNavigationEventArgs e)
-            {
-                if (sender == target)
-                {
-                    isNavigatedRaised = true;
-                }
-            };
+        // Act
+        var isNavigationSuccessful = false;
+        target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
 
-            // Act
-            bool isNavigationSuccessful = false;
-            target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
+        // Verify
+        Assert.True(isNavigationSuccessful);
+        Assert.True(isNavigatingRaised);
+    }
 
-            // Verify
-            Assert.True(isNavigationSuccessful);
-            Assert.True(isNavigatedRaised);
-        }
+    [Fact]
+    public void WhenNavigationSucceeds_NavigatedIsRaised()
+    {
+        // Prepare
+        var view = new object();
+        var viewUri = new Uri(view.GetType().Name, UriKind.Relative);
 
-        [Fact]
-        public void WhenTargetViewCreationThrowsWithAsyncConfirmation_ThenExceptionIsProvidedToNavigationCallback()
+        IRegion region = new Region();
+        region.Add(view);
+
+        var regionName = "RegionName";
+        var regionManager = new RegionManager();
+        regionManager.Regions.Add(regionName, region);
+
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var container = containerMock.Object;
+        var contentLoader = new RegionNavigationContentLoader(container);
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            var containerMock = new Mock<IContainerExtension>();
+            Region = region,
+        };
 
-            var targetException = new Exception();
-            var targetHandlerMock = new Mock<IRegionNavigationContentLoader>();
-            targetHandlerMock
-                .Setup(th => th.LoadContent(It.IsAny<IRegion>(), It.IsAny<NavigationContext>()))
-                .Throws(targetException);
-
-            var journalMock = new Mock<IRegionNavigationJournal>();
-
-            Action<bool> navigationCallback = null;
-            var viewMock = new Mock<IConfirmNavigationRequest>();
-            viewMock
-                .Setup(v => v.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => { navigationCallback = c; });
-
-            var region = new Region();
-            region.Add(viewMock.Object);
-            region.Activate(viewMock.Object);
-
-            var target = new RegionNavigationService(containerMock.Object, targetHandlerMock.Object, journalMock.Object)
-            {
-                Region = region
-            };
-
-            NavigationResult result = null;
-            target.RequestNavigate(new Uri("", UriKind.Relative), nr => result = nr);
-            navigationCallback(true);
-
-            Assert.NotNull(result);
-            Assert.Same(targetException, result.Error);
-        }
-
-        [Fact]
-        public void WhenNavigatingFromViewThatIsNavigationAware_ThenNotifiesActiveViewNavigatingFrom()
+        var isNavigatedRaised = false;
+        target.Navigated += delegate(object sender, RegionNavigationEventArgs e)
         {
-            // Arrange
-            var region = new Region();
-            var viewMock = new Mock<INavigationAware>();
-            var view = viewMock.Object;
-            region.Add(view);
-
-            var view2 = new object();
-            region.Add(view2);
-
-            region.Activate(view);
-
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
-
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
-
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
+            if (sender == target)
             {
-                Region = region
-            };
+                isNavigatedRaised = true;
+            }
+        };
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        // Act
+        var isNavigationSuccessful = false;
+        target.RequestNavigate(viewUri, nr => isNavigationSuccessful = nr.Result == true);
 
-            // Verify
-            viewMock.Verify(v => v.OnNavigatedFrom(It.Is<NavigationContext>(ctx => ctx.Uri == navigationUri && ctx.Parameters.Count() == 0)));
-        }
+        // Verify
+        Assert.True(isNavigationSuccessful);
+        Assert.True(isNavigatedRaised);
+    }
 
-        [Fact]
-        public void WhenNavigationFromViewThatIsNavigationAware_OnlyNotifiesOnNavigateFromForActiveViews()
+    [Fact]
+    public void WhenTargetViewCreationThrowsWithAsyncConfirmation_ThenExceptionIsProvidedToNavigationCallback()
+    {
+        var containerMock = new Mock<IContainerExtension>();
+
+        var targetException = new Exception();
+        var targetHandlerMock = new Mock<IRegionNavigationContentLoader>();
+        targetHandlerMock
+            .Setup(th => th.LoadContent(It.IsAny<IRegion>(), It.IsAny<NavigationContext>()))
+            .Throws(targetException);
+
+        var journalMock = new Mock<IRegionNavigationJournal>();
+
+        Action<bool> navigationCallback = null;
+        var viewMock = new Mock<IConfirmNavigationRequest>();
+        viewMock
+            .Setup(v => v.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => { navigationCallback = c; });
+
+        var region = new Region();
+        region.Add(viewMock.Object);
+        region.Activate(viewMock.Object);
+
+        var target = new RegionNavigationService(containerMock.Object, targetHandlerMock.Object, journalMock.Object)
         {
-            // Arrange
+            Region = region,
+        };
 
-            bool navigationFromInvoked = false;
+        NavigationResult result = null;
+        target.RequestNavigate(new Uri("", UriKind.Relative), nr => result = nr);
+        navigationCallback(true);
 
-            var region = new Region();
+        Assert.NotNull(result);
+        Assert.Same(targetException, result.Error);
+    }
 
-            var viewMock = new Mock<INavigationAware>();
-            viewMock
-                .Setup(x => x.OnNavigatedFrom(It.IsAny<NavigationContext>())).Callback(() => navigationFromInvoked = true);
-            var view = viewMock.Object;
-            region.Add(view);
+    [Fact]
+    public void WhenNavigatingFromViewThatIsNavigationAware_ThenNotifiesActiveViewNavigatingFrom()
+    {
+        // Arrange
+        var region = new Region();
+        var viewMock = new Mock<INavigationAware>();
+        var view = viewMock.Object;
+        region.Add(view);
 
-            var targetViewMock = new Mock<INavigationAware>();
-            region.Add(targetViewMock.Object);
+        var view2 = new object();
+        region.Add(view2);
 
-            var activeViewMock = new Mock<INavigationAware>();
-            region.Add(activeViewMock.Object);
+        region.Activate(view);
 
-            region.Activate(activeViewMock.Object);
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            var navigationUri = new Uri(targetViewMock.Object.GetType().Name, UriKind.Relative);
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
-
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
-
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
-
-            // Verify
-            Assert.False(navigationFromInvoked);
-        }
-
-        [StaFact]
-        public void WhenNavigatingFromActiveViewWithNavigatinAwareDataConext_NotifiesContextOfNavigatingFrom()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Arrange
-            var region = new Region();
+            Region = region,
+        };
 
-            var mockDataContext = new Mock<INavigationAware>();
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            var view1Mock = new Mock<FrameworkElement>();
-            var view1 = view1Mock.Object;
-            view1.DataContext = mockDataContext.Object;
+        // Verify
+        viewMock.Verify(v => v.OnNavigatedFrom(It.Is<NavigationContext>(ctx => ctx.Uri == navigationUri && ctx.Parameters.Count() == 0)));
+    }
 
-            region.Add(view1);
+    [Fact]
+    public void WhenNavigationFromViewThatIsNavigationAware_OnlyNotifiesOnNavigateFromForActiveViews()
+    {
+        // Arrange
 
-            var view2 = new object();
-            region.Add(view2);
+        var navigationFromInvoked = false;
 
-            region.Activate(view1);
+        var region = new Region();
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        var viewMock = new Mock<INavigationAware>();
+        viewMock
+            .Setup(x => x.OnNavigatedFrom(It.IsAny<NavigationContext>())).Callback(() => navigationFromInvoked = true);
+        var view = viewMock.Object;
+        region.Add(view);
 
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
-            IContainerExtension container = containerMock.Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        var targetViewMock = new Mock<INavigationAware>();
+        region.Add(targetViewMock.Object);
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        var activeViewMock = new Mock<INavigationAware>();
+        region.Add(activeViewMock.Object);
 
-            // Act
-            target.RequestNavigate(navigationUri, nr => { });
+        region.Activate(activeViewMock.Object);
 
-            // Verify
-            mockDataContext.Verify(v => v.OnNavigatedFrom(It.Is<NavigationContext>(ctx => ctx.Uri == navigationUri && ctx.Parameters.Count() == 0)));
-        }
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-        [Fact]
-        public void WhenNavigatingWithNullCallback_ThenThrows()
+        var navigationUri = new Uri(targetViewMock.Object.GetType().Name, UriKind.Relative);
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            var region = new Region();
+            Region = region,
+        };
 
-            var navigationUri = new Uri("/", UriKind.Relative);
-            IContainerExtension container = new Mock<IContainerExtension>().Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+        // Verify
+        Assert.False(navigationFromInvoked);
+    }
 
-            ExceptionAssert.Throws<ArgumentNullException>(
-                () =>
-                {
-                    target.RequestNavigate(navigationUri, null);
-                });
-        }
+    [StaFact]
+    public void WhenNavigatingFromActiveViewWithNavigatinAwareDataConext_NotifiesContextOfNavigatingFrom()
+    {
+        // Arrange
+        var region = new Region();
 
-        [Fact]
-        public void WhenNavigatingWithNoRegionSet_ThenMarshallExceptionToCallback()
+        var mockDataContext = new Mock<INavigationAware>();
+
+        var view1Mock = new Mock<FrameworkElement>();
+        var view1 = view1Mock.Object;
+        view1.DataContext = mockDataContext.Object;
+
+        region.Add(view1);
+
+        var view2 = new object();
+        region.Add(view2);
+
+        region.Activate(view1);
+
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+        var container = containerMock.Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            var navigationUri = new Uri("/", UriKind.Relative);
-            IContainerExtension container = new Mock<IContainerExtension>().Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+            Region = region,
+        };
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal);
+        // Act
+        target.RequestNavigate(navigationUri, nr => { });
 
-            Exception error = null;
-            target.RequestNavigate(navigationUri, nr => error = nr.Error);
+        // Verify
+        mockDataContext.Verify(v => v.OnNavigatedFrom(It.Is<NavigationContext>(ctx => ctx.Uri == navigationUri && ctx.Parameters.Count() == 0)));
+    }
 
-            Assert.NotNull(error);
-            Assert.IsType<InvalidOperationException>(error);
-        }
+    [Fact]
+    public void WhenNavigatingWithNullCallback_ThenThrows()
+    {
+        var region = new Region();
 
-        [Fact]
-        public void WhenNavigatingWithNullUri_ThenMarshallExceptionToCallback()
+        var navigationUri = new Uri("/", UriKind.Relative);
+        var container = new Mock<IContainerExtension>().Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            IContainerExtension container = new Mock<IContainerExtension>().Object;
-            RegionNavigationContentLoader contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
-            IRegionNavigationJournal journal = new Mock<IRegionNavigationJournal>().Object;
+            Region = region,
+        };
 
-            RegionNavigationService target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = new Region()
-            };
+        ExceptionAssert.Throws<ArgumentNullException>(
+            () => { target.RequestNavigate(navigationUri, null); });
+    }
 
-            Exception error = null;
-            target.RequestNavigate(null, nr => error = nr.Error);
+    [Fact]
+    public void WhenNavigatingWithNoRegionSet_ThenMarshallExceptionToCallback()
+    {
+        var navigationUri = new Uri("/", UriKind.Relative);
+        var container = new Mock<IContainerExtension>().Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            Assert.NotNull(error);
-            Assert.IsType<ArgumentNullException>(error);
-        }
+        var target = new RegionNavigationService(container, contentLoader, journal);
 
+        Exception error = null;
+        target.RequestNavigate(navigationUri, nr => error = nr.Error);
 
-        [Fact]
-        public void WhenNavigationFailsBecauseTheContentViewCannotBeRetrieved_ThenNavigationFailedIsRaised()
+        Assert.NotNull(error);
+        Assert.IsType<InvalidOperationException>(error);
+    }
+
+    [Fact]
+    public void WhenNavigatingWithNullUri_ThenMarshallExceptionToCallback()
+    {
+        var container = new Mock<IContainerExtension>().Object;
+        var contentLoader = new Mock<RegionNavigationContentLoader>(container).Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region { Name = "RegionName" };
+            Region = new Region(),
+        };
 
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+        Exception error = null;
+        target.RequestNavigate(null, nr => error = nr.Error);
 
-            var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
-            contentLoaderMock
-                .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
-                .Throws<InvalidOperationException>();
+        Assert.NotNull(error);
+        Assert.IsType<ArgumentNullException>(error);
+    }
 
-            var container = containerMock.Object;
-            var contentLoader = contentLoaderMock.Object;
-            var journal = new Mock<IRegionNavigationJournal>().Object;
 
-            var target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
+    [Fact]
+    public void WhenNavigationFailsBecauseTheContentViewCannotBeRetrieved_ThenNavigationFailedIsRaised()
+    {
+        // Prepare
+        var region = new Region { Name = "RegionName" };
 
-            RegionNavigationFailedEventArgs eventArgs = null;
-            target.NavigationFailed += delegate (object sender, RegionNavigationFailedEventArgs e)
-            {
-                if (sender == target)
-                {
-                    eventArgs = e;
-                }
-            };
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
 
-            // Act
-            bool? isNavigationSuccessful = null;
-            target.RequestNavigate(new Uri("invalid", UriKind.Relative), nr => isNavigationSuccessful = nr.Result);
+        var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
+        contentLoaderMock
+            .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
+            .Throws<InvalidOperationException>();
 
-            // Verify
-            Assert.False(isNavigationSuccessful.Value);
-            Assert.NotNull(eventArgs);
-            Assert.NotNull(eventArgs.Error);
-        }
+        var container = containerMock.Object;
+        var contentLoader = contentLoaderMock.Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
 
-        [Fact]
-        public void WhenNavigationFailsBecauseActiveViewRejectsIt_ThenNavigationFailedIsRaised()
+        var target = new RegionNavigationService(container, contentLoader, journal)
         {
-            // Prepare
-            var region = new Region { Name = "RegionName" };
+            Region = region,
+        };
 
-            var view1Mock = new Mock<IConfirmNavigationRequest>();
-            view1Mock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
-                .Verifiable();
-
-            var view1 = view1Mock.Object;
-
-            var view2 = new object();
-
-            region.Add(view1);
-            region.Add(view2);
-
-            region.Activate(view1);
-
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
-
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
-
-            var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
-            contentLoaderMock
-                .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
-                .Returns(view2);
-
-            var container = containerMock.Object;
-            var contentLoader = contentLoaderMock.Object;
-            var journal = new Mock<IRegionNavigationJournal>().Object;
-
-            var target = new RegionNavigationService(container, contentLoader, journal)
-            {
-                Region = region
-            };
-
-            RegionNavigationFailedEventArgs eventArgs = null;
-            target.NavigationFailed += delegate (object sender, RegionNavigationFailedEventArgs e)
-            {
-                if (sender == target)
-                {
-                    eventArgs = e;
-                }
-            };
-
-            // Act
-            bool? isNavigationSuccessful = null;
-            target.RequestNavigate(navigationUri, nr => isNavigationSuccessful = nr.Result);
-
-            // Verify
-            view1Mock.VerifyAll();
-            Assert.False(isNavigationSuccessful.Value);
-            Assert.NotNull(eventArgs);
-            Assert.Null(eventArgs.Error);
-        }
-
-        [StaFact]
-        public void WhenNavigationFailsBecauseDataContextForActiveViewRejectsIt_ThenNavigationFailedIsRaised()
+        RegionNavigationFailedEventArgs eventArgs = null;
+        target.NavigationFailed += delegate(object sender, RegionNavigationFailedEventArgs e)
         {
-            // Prepare
-            var region = new Region { Name = "RegionName" };
-
-            var viewModel1Mock = new Mock<IConfirmNavigationRequest>();
-            viewModel1Mock
-                .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
-                .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
-                .Verifiable();
-
-            var view1Mock = new Mock<FrameworkElement>();
-            var view1 = view1Mock.Object;
-            view1.DataContext = viewModel1Mock.Object;
-
-            var view2 = new object();
-
-            region.Add(view1);
-            region.Add(view2);
-
-            region.Activate(view1);
-
-            var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
-
-            var containerMock = new Mock<IContainerExtension>();
-            containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
-
-            var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
-            contentLoaderMock
-                .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
-                .Returns(view2);
-
-            var container = containerMock.Object;
-            var contentLoader = contentLoaderMock.Object;
-            var journal = new Mock<IRegionNavigationJournal>().Object;
-
-            var target = new RegionNavigationService(container, contentLoader, journal)
+            if (sender == target)
             {
-                Region = region
-            };
+                eventArgs = e;
+            }
+        };
 
-            RegionNavigationFailedEventArgs eventArgs = null;
-            target.NavigationFailed += delegate (object sender, RegionNavigationFailedEventArgs e)
+        // Act
+        bool? isNavigationSuccessful = null;
+        target.RequestNavigate(new Uri("invalid", UriKind.Relative), nr => isNavigationSuccessful = nr.Result);
+
+        // Verify
+        Assert.False(isNavigationSuccessful.Value);
+        Assert.NotNull(eventArgs);
+        Assert.NotNull(eventArgs.Error);
+    }
+
+    [Fact]
+    public void WhenNavigationFailsBecauseActiveViewRejectsIt_ThenNavigationFailedIsRaised()
+    {
+        // Prepare
+        var region = new Region { Name = "RegionName" };
+
+        var view1Mock = new Mock<IConfirmNavigationRequest>();
+        view1Mock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
+            .Verifiable();
+
+        var view1 = view1Mock.Object;
+
+        var view2 = new object();
+
+        region.Add(view1);
+        region.Add(view2);
+
+        region.Activate(view1);
+
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
+        contentLoaderMock
+            .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
+            .Returns(view2);
+
+        var container = containerMock.Object;
+        var contentLoader = contentLoaderMock.Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
+        {
+            Region = region,
+        };
+
+        RegionNavigationFailedEventArgs eventArgs = null;
+        target.NavigationFailed += delegate(object sender, RegionNavigationFailedEventArgs e)
+        {
+            if (sender == target)
             {
-                if (sender == target)
-                {
-                    eventArgs = e;
-                }
-            };
+                eventArgs = e;
+            }
+        };
 
-            // Act
-            bool? isNavigationSuccessful = null;
-            target.RequestNavigate(navigationUri, nr => isNavigationSuccessful = nr.Result);
+        // Act
+        bool? isNavigationSuccessful = null;
+        target.RequestNavigate(navigationUri, nr => isNavigationSuccessful = nr.Result);
 
-            // Verify
-            viewModel1Mock.VerifyAll();
-            Assert.False(isNavigationSuccessful.Value);
-            Assert.NotNull(eventArgs);
-            Assert.Null(eventArgs.Error);
-        }
+        // Verify
+        view1Mock.VerifyAll();
+        Assert.False(isNavigationSuccessful.Value);
+        Assert.NotNull(eventArgs);
+        Assert.Null(eventArgs.Error);
+    }
+
+    [StaFact]
+    public void WhenNavigationFailsBecauseDataContextForActiveViewRejectsIt_ThenNavigationFailedIsRaised()
+    {
+        // Prepare
+        var region = new Region { Name = "RegionName" };
+
+        var viewModel1Mock = new Mock<IConfirmNavigationRequest>();
+        viewModel1Mock
+            .Setup(ina => ina.ConfirmNavigationRequest(It.IsAny<NavigationContext>(), It.IsAny<Action<bool>>()))
+            .Callback<NavigationContext, Action<bool>>((nc, c) => c(false))
+            .Verifiable();
+
+        var view1Mock = new Mock<FrameworkElement>();
+        var view1 = view1Mock.Object;
+        view1.DataContext = viewModel1Mock.Object;
+
+        var view2 = new object();
+
+        region.Add(view1);
+        region.Add(view2);
+
+        region.Activate(view1);
+
+        var navigationUri = new Uri(view2.GetType().Name, UriKind.Relative);
+
+        var containerMock = new Mock<IContainerExtension>();
+        containerMock.Setup(x => x.Resolve(typeof(IRegionNavigationJournalEntry))).Returns(new RegionNavigationJournalEntry());
+
+        var contentLoaderMock = new Mock<IRegionNavigationContentLoader>();
+        contentLoaderMock
+            .Setup(cl => cl.LoadContent(region, It.IsAny<NavigationContext>()))
+            .Returns(view2);
+
+        var container = containerMock.Object;
+        var contentLoader = contentLoaderMock.Object;
+        var journal = new Mock<IRegionNavigationJournal>().Object;
+
+        var target = new RegionNavigationService(container, contentLoader, journal)
+        {
+            Region = region,
+        };
+
+        RegionNavigationFailedEventArgs eventArgs = null;
+        target.NavigationFailed += delegate(object sender, RegionNavigationFailedEventArgs e)
+        {
+            if (sender == target)
+            {
+                eventArgs = e;
+            }
+        };
+
+        // Act
+        bool? isNavigationSuccessful = null;
+        target.RequestNavigate(navigationUri, nr => isNavigationSuccessful = nr.Result);
+
+        // Verify
+        viewModel1Mock.VerifyAll();
+        Assert.False(isNavigationSuccessful.Value);
+        Assert.NotNull(eventArgs);
+        Assert.Null(eventArgs.Error);
     }
 }

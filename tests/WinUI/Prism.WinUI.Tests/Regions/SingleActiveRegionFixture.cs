@@ -1,29 +1,25 @@
-
-
 using Prism.Regions;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Regions
+namespace Prism.WinUI.Tests.Regions;
+
+public class SingleActiveRegionFixture
 {
-
-    public class SingleActiveRegionFixture
+    [Fact]
+    public void ActivatingNewViewDeactivatesCurrent()
     {
-        [Fact]
-        public void ActivatingNewViewDeactivatesCurrent()
-        {
-            IRegion region = new SingleActiveRegion();
-            var view = new object();
-            region.Add(view);
-            region.Activate(view);
+        IRegion region = new SingleActiveRegion();
+        var view = new object();
+        region.Add(view);
+        region.Activate(view);
 
-            Assert.True(region.ActiveViews.Contains(view));
+        Assert.True(region.ActiveViews.Contains(view));
 
-            var view2 = new object();
-            region.Add(view2);
-            region.Activate(view2);
+        var view2 = new object();
+        region.Add(view2);
+        region.Activate(view2);
 
-            Assert.False(region.ActiveViews.Contains(view));
-            Assert.True(region.ActiveViews.Contains(view2));
-        }
+        Assert.False(region.ActiveViews.Contains(view));
+        Assert.True(region.ActiveViews.Contains(view2));
     }
 }

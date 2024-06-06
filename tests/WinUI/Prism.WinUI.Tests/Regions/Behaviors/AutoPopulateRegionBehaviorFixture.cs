@@ -1,120 +1,113 @@
-
-
-using System;
-using System.Collections.Generic;
 using Prism.Regions;
 using Prism.Regions.Behaviors;
-using Prism.Wpf.Tests.Mocks;
+using Prism.WinUI.Tests.Mocks;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Regions.Behaviors
+namespace Prism.WinUI.Tests.Regions.Behaviors;
+
+public class AutoPopulateRegionBehaviorFixture
 {
-
-    public class AutoPopulateRegionBehaviorFixture
+    [Fact]
+    public void ShouldGetViewsFromRegistryOnAttach()
     {
-        [Fact]
-        public void ShouldGetViewsFromRegistryOnAttach()
+        var region = new MockPresentationRegion() { Name = "MyRegion" };
+        var viewFactory = new MockRegionContentRegistry();
+        var view = new object();
+        viewFactory.GetContentsReturnValue.Add(view);
+        var behavior = new AutoPopulateRegionBehavior(viewFactory)
         {
-            var region = new MockPresentationRegion() { Name = "MyRegion" };
-            var viewFactory = new MockRegionContentRegistry();
-            var view = new object();
-            viewFactory.GetContentsReturnValue.Add(view);
-            var behavior = new AutoPopulateRegionBehavior(viewFactory)
-            {
-                Region = region
-            };
+            Region = region,
+        };
+
+        behavior.Attach();
+
+        Assert.Equal("MyRegion", viewFactory.GetContentsArgumentRegionName);
+        Assert.Single(region.MockViews.Items);
+        Assert.Equal(view, region.MockViews.Items[0]);
+    }
+
+    [Fact]
+    public void ShouldGetViewsFromRegistryWhenRegisteringItAfterAttach()
+    {
+        var region = new MockPresentationRegion() { Name = "MyRegion" };
+        var viewFactory = new MockRegionContentRegistry();
+        var behavior = new AutoPopulateRegionBehavior(viewFactory)
+        {
+            Region = region,
+        };
+        var view = new object();
+
+        behavior.Attach();
+        viewFactory.GetContentsReturnValue.Add(view);
+        viewFactory.RaiseContentRegistered("MyRegion", view);
+
+        Assert.Equal("MyRegion", viewFactory.GetContentsArgumentRegionName);
+        Assert.Single(region.MockViews.Items);
+        Assert.Equal(view, region.MockViews.Items[0]);
+    }
+
+    [Fact]
+    public void NullRegionThrows()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            var behavior = new AutoPopulateRegionBehavior(new MockRegionContentRegistry());
 
             behavior.Attach();
+        });
+    }
 
-            Assert.Equal("MyRegion", viewFactory.GetContentsArgumentRegionName);
-            Assert.Single(region.MockViews.Items);
-            Assert.Equal(view, region.MockViews.Items[0]);
+    [Fact]
+    public void CanAttachBeforeSettingName()
+    {
+        var region = new MockPresentationRegion() { Name = null };
+        var viewFactory = new MockRegionContentRegistry();
+        var view = new object();
+        viewFactory.GetContentsReturnValue.Add(view);
+        var behavior = new AutoPopulateRegionBehavior(viewFactory)
+        {
+            Region = region,
+        };
+
+        behavior.Attach();
+        Assert.False(viewFactory.GetContentsCalled);
+
+        region.Name = "MyRegion";
+
+        Assert.True(viewFactory.GetContentsCalled);
+        Assert.Equal("MyRegion", viewFactory.GetContentsArgumentRegionName);
+        Assert.Single(region.MockViews.Items);
+        Assert.Equal(view, region.MockViews.Items[0]);
+    }
+
+    private class MockRegionContentRegistry : IRegionViewRegistry
+    {
+        public readonly List<object> GetContentsReturnValue = new List<object>();
+        public string GetContentsArgumentRegionName;
+        public bool GetContentsCalled;
+
+        public event EventHandler<ViewRegisteredEventArgs> ContentRegistered;
+
+        public IEnumerable<object> GetContents(string regionName)
+        {
+            GetContentsCalled = true;
+            this.GetContentsArgumentRegionName = regionName;
+            return this.GetContentsReturnValue;
         }
 
-        [Fact]
-        public void ShouldGetViewsFromRegistryWhenRegisteringItAfterAttach()
+        public void RaiseContentRegistered(string regionName, object view)
         {
-            var region = new MockPresentationRegion() { Name = "MyRegion" };
-            var viewFactory = new MockRegionContentRegistry();
-            var behavior = new AutoPopulateRegionBehavior(viewFactory)
-            {
-                Region = region
-            };
-            var view = new object();
-
-            behavior.Attach();
-            viewFactory.GetContentsReturnValue.Add(view);
-            viewFactory.RaiseContentRegistered("MyRegion", view);
-
-            Assert.Equal("MyRegion", viewFactory.GetContentsArgumentRegionName);
-            Assert.Single(region.MockViews.Items);
-            Assert.Equal(view, region.MockViews.Items[0]);
+            this.ContentRegistered(this, new ViewRegisteredEventArgs(regionName, () => view));
         }
 
-        [Fact]
-        public void NullRegionThrows()
+        public void RegisterViewWithRegion(string regionName, Type viewType)
         {
-            var ex = Assert.Throws<InvalidOperationException>(() =>
-            {
-                var behavior = new AutoPopulateRegionBehavior(new MockRegionContentRegistry());
-
-                behavior.Attach();
-            });
-
+            throw new NotImplementedException();
         }
 
-        [Fact]
-        public void CanAttachBeforeSettingName()
+        public void RegisterViewWithRegion(string regionName, Func<object> getContentDelegate)
         {
-            var region = new MockPresentationRegion() { Name = null };
-            var viewFactory = new MockRegionContentRegistry();
-            var view = new object();
-            viewFactory.GetContentsReturnValue.Add(view);
-            var behavior = new AutoPopulateRegionBehavior(viewFactory)
-            {
-                Region = region
-            };
-
-            behavior.Attach();
-            Assert.False(viewFactory.GetContentsCalled);
-
-            region.Name = "MyRegion";
-
-            Assert.True(viewFactory.GetContentsCalled);
-            Assert.Equal("MyRegion", viewFactory.GetContentsArgumentRegionName);
-            Assert.Single(region.MockViews.Items);
-            Assert.Equal(view, region.MockViews.Items[0]);
-        }
-
-        private class MockRegionContentRegistry : IRegionViewRegistry
-        {
-            public readonly List<object> GetContentsReturnValue = new List<object>();
-            public string GetContentsArgumentRegionName;
-            public bool GetContentsCalled;
-
-            public event EventHandler<ViewRegisteredEventArgs> ContentRegistered;
-
-            public IEnumerable<object> GetContents(string regionName)
-            {
-                GetContentsCalled = true;
-                this.GetContentsArgumentRegionName = regionName;
-                return this.GetContentsReturnValue;
-            }
-
-            public void RaiseContentRegistered(string regionName, object view)
-            {
-                this.ContentRegistered(this, new ViewRegisteredEventArgs(regionName, () => view));
-            }
-
-            public void RegisterViewWithRegion(string regionName, Type viewType)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void RegisterViewWithRegion(string regionName, Func<object> getContentDelegate)
-            {
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,8 +1,7 @@
-using System;
 using Prism.Ioc;
 using Prism.Modularity;
 
-namespace Prism.Wpf.Tests.Mocks.Modules
+namespace Prism.WinUI.Tests.Mocks.Modules
 {
     [Module(ModuleName = "DependencyModule")]
     public class DependencyModule : IModule

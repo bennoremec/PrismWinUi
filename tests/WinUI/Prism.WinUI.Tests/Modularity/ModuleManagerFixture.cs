@@ -1,517 +1,500 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Moq;
 using Prism.Ioc;
 using Prism.Modularity;
-using Prism.Wpf.Tests.Mocks;
+using Prism.WinUI.Tests.Mocks;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Modularity
+namespace Prism.WinUI.Tests.Modularity;
+
+public class ModuleManagerFixture
 {
-
-    public class ModuleManagerFixture
+    [Fact]
+    public void NullLoaderThrows()
     {
-        [Fact]
-        public void NullLoaderThrows()
-        {
-            var ex = Assert.Throws<ArgumentNullException>(() =>
-            {
-                new ModuleManager(null, new MockModuleCatalog());
-            });
+        var ex = Assert.Throws<ArgumentNullException>(() => { new ModuleManager(null, new MockModuleCatalog()); });
+    }
 
-        }
+    [Fact]
+    public void NullCatalogThrows()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => { new ModuleManager(new MockModuleInitializer(), null); });
+    }
 
-        [Fact]
-        public void NullCatalogThrows()
-        {
-            var ex = Assert.Throws<ArgumentNullException>(() =>
-            {
-                new ModuleManager(new MockModuleInitializer(), null);
-            });
+    [Fact]
+    public void ShouldInvokeRetrieverForModules()
+    {
+        var loader = new MockModuleInitializer();
+        var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
+        var manager = new ModuleManager(loader, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
 
-        }
+        manager.Run();
 
-        [Fact]
-        public void ShouldInvokeRetrieverForModules()
+        Assert.Contains(moduleInfo, moduleTypeLoader.LoadedModules);
+    }
+
+    [Fact]
+    public void ShouldInitializeModulesOnRetrievalCompleted()
+    {
+        var loader = new MockModuleInitializer();
+        var backgroungModuleInfo = CreateModuleInfo("NeedsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new MockModuleCatalog { Modules = { backgroungModuleInfo } };
+        var manager = new ModuleManager(loader, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
+        Assert.False(loader.InitializeCalled);
+
+        manager.Run();
+
+        Assert.True(loader.InitializeCalled);
+        Assert.Single(loader.InitializedModules);
+        Assert.Equal(backgroungModuleInfo, loader.InitializedModules[0]);
+    }
+
+    [Fact]
+    public void ShouldInitializeModuleOnDemand()
+    {
+        var loader = new MockModuleInitializer();
+        var onDemandModule = CreateModuleInfo("NeedsRetrieval", InitializationMode.OnDemand);
+        var catalog = new MockModuleCatalog { Modules = { onDemandModule } };
+        var manager = new ModuleManager(loader, catalog);
+        var moduleRetriever = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleRetriever };
+        manager.Run();
+
+        Assert.False(loader.InitializeCalled);
+        Assert.Empty(moduleRetriever.LoadedModules);
+
+        manager.LoadModule("NeedsRetrieval");
+
+        Assert.Single(moduleRetriever.LoadedModules);
+        Assert.True(loader.InitializeCalled);
+        Assert.Single(loader.InitializedModules);
+        Assert.Equal(onDemandModule, loader.InitializedModules[0]);
+    }
+
+    [Fact]
+    public void InvalidOnDemandModuleNameThrows()
+    {
+        var ex = Assert.Throws<ModuleNotFoundException>(() =>
         {
             var loader = new MockModuleInitializer();
-            var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-            ModuleManager manager = new ModuleManager(loader, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
 
+            var catalog = new MockModuleCatalog { Modules = new List<IModuleInfo> { CreateModuleInfo("Missing", InitializationMode.OnDemand) } };
+
+            var manager = new ModuleManager(loader, catalog);
+            var moduleTypeLoader = new MockModuleTypeLoader();
+
+            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
             manager.Run();
 
-            Assert.Contains(moduleInfo, moduleTypeLoader.LoadedModules);
-        }
+            manager.LoadModule("NonExistent");
+        });
+    }
 
-        [Fact]
-        public void ShouldInitializeModulesOnRetrievalCompleted()
+    [Fact]
+    public void EmptyOnDemandModuleReturnedThrows()
+    {
+        var ex = Assert.Throws<ModuleNotFoundException>(() =>
         {
             var loader = new MockModuleInitializer();
-            var backgroungModuleInfo = CreateModuleInfo("NeedsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new MockModuleCatalog { Modules = { backgroungModuleInfo } };
-            ModuleManager manager = new ModuleManager(loader, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-            Assert.False(loader.InitializeCalled);
 
-            manager.Run();
-
-            Assert.True(loader.InitializeCalled);
-            Assert.Single(loader.InitializedModules);
-            Assert.Equal(backgroungModuleInfo, loader.InitializedModules[0]);
-        }
-
-        [Fact]
-        public void ShouldInitializeModuleOnDemand()
-        {
-            var loader = new MockModuleInitializer();
-            var onDemandModule = CreateModuleInfo("NeedsRetrieval", InitializationMode.OnDemand);
-            var catalog = new MockModuleCatalog { Modules = { onDemandModule } };
-            ModuleManager manager = new ModuleManager(loader, catalog);
+            var catalog = new MockModuleCatalog { CompleteListWithDependencies = modules => new List<ModuleInfo>() };
+            var manager = new ModuleManager(loader, catalog);
             var moduleRetriever = new MockModuleTypeLoader();
             manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleRetriever };
             manager.Run();
 
-            Assert.False(loader.InitializeCalled);
-            Assert.Empty(moduleRetriever.LoadedModules);
+            manager.LoadModule("NullModule");
+        });
+    }
 
-            manager.LoadModule("NeedsRetrieval");
+    [Fact]
+    public void ShouldNotLoadTypeIfModuleInitialized()
+    {
+        var loader = new MockModuleInitializer();
+        var alreadyPresentModule = CreateModuleInfo(typeof(MockModule), InitializationMode.WhenAvailable);
+        alreadyPresentModule.State = ModuleState.ReadyForInitialization;
+        var catalog = new MockModuleCatalog { Modules = { alreadyPresentModule } };
+        var manager = new ModuleManager(loader, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
 
-            Assert.Single(moduleRetriever.LoadedModules);
-            Assert.True(loader.InitializeCalled);
-            Assert.Single(loader.InitializedModules);
-            Assert.Equal(onDemandModule, loader.InitializedModules[0]);
-        }
+        manager.Run();
 
-        [Fact]
-        public void InvalidOnDemandModuleNameThrows()
+        Assert.DoesNotContain(alreadyPresentModule, moduleTypeLoader.LoadedModules);
+        Assert.True(loader.InitializeCalled);
+        Assert.Single(loader.InitializedModules);
+        Assert.Equal(alreadyPresentModule, loader.InitializedModules[0]);
+    }
+
+    [Fact]
+    public void ShouldNotLoadSameModuleTwice()
+    {
+        var loader = new MockModuleInitializer();
+        var onDemandModule = CreateModuleInfo(typeof(MockModule), InitializationMode.OnDemand);
+        var catalog = new MockModuleCatalog { Modules = { onDemandModule } };
+        var manager = new ModuleManager(loader, catalog);
+        manager.Run();
+        manager.LoadModule("MockModule");
+        loader.InitializeCalled = false;
+        manager.LoadModule("MockModule");
+
+        Assert.False(loader.InitializeCalled);
+    }
+
+    [Fact]
+    public void ShouldNotLoadModuleThatNeedsRetrievalTwice()
+    {
+        var loader = new MockModuleInitializer();
+        var onDemandModule = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.OnDemand);
+        var catalog = new MockModuleCatalog { Modules = { onDemandModule } };
+        var manager = new ModuleManager(loader, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
+        manager.Run();
+        manager.LoadModule("ModuleThatNeedsRetrieval");
+        moduleTypeLoader.RaiseLoadModuleCompleted(new LoadModuleCompletedEventArgs(onDemandModule, null));
+        loader.InitializeCalled = false;
+
+        manager.LoadModule("ModuleThatNeedsRetrieval");
+
+        Assert.False(loader.InitializeCalled);
+    }
+
+    [Fact]
+    public void ShouldCallValidateCatalogBeforeGettingGroupsFromCatalog()
+    {
+        var loader = new MockModuleInitializer();
+        var catalog = new MockModuleCatalog();
+        var manager = new ModuleManager(loader, catalog);
+        var validateCatalogCalled = false;
+        var getModulesCalledBeforeValidate = false;
+
+        catalog.ValidateCatalog = () => validateCatalogCalled = true;
+        catalog.CompleteListWithDependencies = f =>
         {
-            var ex = Assert.Throws<ModuleNotFoundException>(() =>
+            if (!validateCatalogCalled)
             {
-                var loader = new MockModuleInitializer();
-
-                var catalog = new MockModuleCatalog { Modules = new List<IModuleInfo> { CreateModuleInfo("Missing", InitializationMode.OnDemand) } };
-
-                ModuleManager manager = new ModuleManager(loader, catalog);
-                var moduleTypeLoader = new MockModuleTypeLoader();
-
-                manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-                manager.Run();
-
-                manager.LoadModule("NonExistent");
-            });
-
-
-        }
-
-        [Fact]
-        public void EmptyOnDemandModuleReturnedThrows()
-        {
-            var ex = Assert.Throws<ModuleNotFoundException>(() =>
-            {
-                var loader = new MockModuleInitializer();
-
-                var catalog = new MockModuleCatalog { CompleteListWithDependencies = modules => new List<ModuleInfo>() };
-                ModuleManager manager = new ModuleManager(loader, catalog);
-                var moduleRetriever = new MockModuleTypeLoader();
-                manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleRetriever };
-                manager.Run();
-
-                manager.LoadModule("NullModule");
-            });
-
-
-        }
-
-        [Fact]
-        public void ShouldNotLoadTypeIfModuleInitialized()
-        {
-            var loader = new MockModuleInitializer();
-            var alreadyPresentModule = CreateModuleInfo(typeof(MockModule), InitializationMode.WhenAvailable);
-            alreadyPresentModule.State = ModuleState.ReadyForInitialization;
-            var catalog = new MockModuleCatalog { Modules = { alreadyPresentModule } };
-            var manager = new ModuleManager(loader, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-
-            manager.Run();
-
-            Assert.DoesNotContain(alreadyPresentModule, moduleTypeLoader.LoadedModules);
-            Assert.True(loader.InitializeCalled);
-            Assert.Single(loader.InitializedModules);
-            Assert.Equal(alreadyPresentModule, loader.InitializedModules[0]);
-        }
-
-        [Fact]
-        public void ShouldNotLoadSameModuleTwice()
-        {
-            var loader = new MockModuleInitializer();
-            var onDemandModule = CreateModuleInfo(typeof(MockModule), InitializationMode.OnDemand);
-            var catalog = new MockModuleCatalog { Modules = { onDemandModule } };
-            var manager = new ModuleManager(loader, catalog);
-            manager.Run();
-            manager.LoadModule("MockModule");
-            loader.InitializeCalled = false;
-            manager.LoadModule("MockModule");
-
-            Assert.False(loader.InitializeCalled);
-        }
-
-        [Fact]
-        public void ShouldNotLoadModuleThatNeedsRetrievalTwice()
-        {
-            var loader = new MockModuleInitializer();
-            var onDemandModule = CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.OnDemand);
-            var catalog = new MockModuleCatalog { Modules = { onDemandModule } };
-            var manager = new ModuleManager(loader, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-            manager.Run();
-            manager.LoadModule("ModuleThatNeedsRetrieval");
-            moduleTypeLoader.RaiseLoadModuleCompleted(new LoadModuleCompletedEventArgs(onDemandModule, null));
-            loader.InitializeCalled = false;
-
-            manager.LoadModule("ModuleThatNeedsRetrieval");
-
-            Assert.False(loader.InitializeCalled);
-        }
-
-        [Fact]
-        public void ShouldCallValidateCatalogBeforeGettingGroupsFromCatalog()
-        {
-            var loader = new MockModuleInitializer();
-            var catalog = new MockModuleCatalog();
-            var manager = new ModuleManager(loader, catalog);
-            bool validateCatalogCalled = false;
-            bool getModulesCalledBeforeValidate = false;
-
-            catalog.ValidateCatalog = () => validateCatalogCalled = true;
-            catalog.CompleteListWithDependencies = f =>
-                                                     {
-                                                         if (!validateCatalogCalled)
-                                                         {
-                                                             getModulesCalledBeforeValidate = true;
-                                                         }
-
-                                                         return null;
-                                                     };
-            manager.Run();
-
-            Assert.True(validateCatalogCalled);
-            Assert.False(getModulesCalledBeforeValidate);
-        }
-
-        [Fact]
-        public void ShouldNotInitializeIfDependenciesAreNotMet()
-        {
-            var loader = new MockModuleInitializer();
-            var requiredModule = CreateModuleInfo("ModuleThatNeedsRetrieval1", InitializationMode.WhenAvailable);
-            requiredModule.ModuleName = "RequiredModule";
-            var dependantModuleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval2", InitializationMode.WhenAvailable, "RequiredModule");
-
-            var catalog = new MockModuleCatalog { Modules = { requiredModule, dependantModuleInfo } };
-            catalog.GetDependentModules = m => new[] { requiredModule };
-
-            ModuleManager manager = new ModuleManager(loader, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-
-            manager.Run();
-
-            moduleTypeLoader.RaiseLoadModuleCompleted(new LoadModuleCompletedEventArgs(dependantModuleInfo, null));
-
-            Assert.False(loader.InitializeCalled);
-            Assert.Empty(loader.InitializedModules);
-        }
-
-        [Fact]
-        public void ShouldInitializeIfDependenciesAreMet()
-        {
-            var initializer = new MockModuleInitializer();
-            var requiredModule = CreateModuleInfo("ModuleThatNeedsRetrieval1", InitializationMode.WhenAvailable);
-            requiredModule.ModuleName = "RequiredModule";
-            var dependantModuleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval2", InitializationMode.WhenAvailable, "RequiredModule");
-
-            var catalog = new MockModuleCatalog { Modules = { requiredModule, dependantModuleInfo } };
-            catalog.GetDependentModules = delegate (IModuleInfo module)
-                                              {
-                                                  if (module == dependantModuleInfo)
-                                                      return new[] { requiredModule };
-                                                  else
-                                                      return null;
-                                              };
-
-            ModuleManager manager = new ModuleManager(initializer, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-
-            manager.Run();
-
-            Assert.True(initializer.InitializeCalled);
-            Assert.Equal(2, initializer.InitializedModules.Count);
-        }
-
-        [Fact]
-        public void ShouldThrowOnRetrieverErrorAndWrapException()
-        {
-            var loader = new MockModuleInitializer();
-            var moduleInfo = CreateModuleInfo("NeedsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
-            ModuleManager manager = new ModuleManager(loader, catalog);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-
-            Exception retrieverException = new Exception();
-            moduleTypeLoader.LoadCompletedError = retrieverException;
-
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
-            Assert.False(loader.InitializeCalled);
-
-            try
-            {
-                manager.Run();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsType<ModuleTypeLoadingException>(ex);
-                Assert.Equal(moduleInfo.ModuleName, ((ModularityException)ex).ModuleName);
-                Assert.Contains(moduleInfo.ModuleName, ex.Message);
-                Assert.Same(retrieverException, ex.InnerException);
-                return;
+                getModulesCalledBeforeValidate = true;
             }
 
-            //Assert.Fail("Exception not thrown.");
-        }
+            return null;
+        };
+        manager.Run();
 
-        [Fact]
-        public void ShouldThrowIfNoRetrieverCanRetrieveModule()
+        Assert.True(validateCatalogCalled);
+        Assert.False(getModulesCalledBeforeValidate);
+    }
+
+    [Fact]
+    public void ShouldNotInitializeIfDependenciesAreNotMet()
+    {
+        var loader = new MockModuleInitializer();
+        var requiredModule = CreateModuleInfo("ModuleThatNeedsRetrieval1", InitializationMode.WhenAvailable);
+        requiredModule.ModuleName = "RequiredModule";
+        var dependantModuleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval2", InitializationMode.WhenAvailable, "RequiredModule");
+
+        var catalog = new MockModuleCatalog { Modules = { requiredModule, dependantModuleInfo } };
+        catalog.GetDependentModules = m => new[] { requiredModule };
+
+        var manager = new ModuleManager(loader, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
+
+        manager.Run();
+
+        moduleTypeLoader.RaiseLoadModuleCompleted(new LoadModuleCompletedEventArgs(dependantModuleInfo, null));
+
+        Assert.False(loader.InitializeCalled);
+        Assert.Empty(loader.InitializedModules);
+    }
+
+    [Fact]
+    public void ShouldInitializeIfDependenciesAreMet()
+    {
+        var initializer = new MockModuleInitializer();
+        var requiredModule = CreateModuleInfo("ModuleThatNeedsRetrieval1", InitializationMode.WhenAvailable);
+        requiredModule.ModuleName = "RequiredModule";
+        var dependantModuleInfo = CreateModuleInfo("ModuleThatNeedsRetrieval2", InitializationMode.WhenAvailable, "RequiredModule");
+
+        var catalog = new MockModuleCatalog { Modules = { requiredModule, dependantModuleInfo } };
+        catalog.GetDependentModules = delegate(IModuleInfo module)
         {
-            var ex = Assert.Throws<ModuleTypeLoaderNotFoundException>(() =>
-            {
+            if (module == dependantModuleInfo)
+                return new[] { requiredModule };
+            else
+                return null;
+        };
 
-                var loader = new MockModuleInitializer();
-                var catalog = new MockModuleCatalog { Modules = { CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable) } };
-                ModuleManager manager = new ModuleManager(loader, catalog)
-                {
-                    ModuleTypeLoaders = new List<IModuleTypeLoader> { new MockModuleTypeLoader() { canLoadModuleTypeReturnValue = false } }
-                };
-                manager.Run();
-            });
+        var manager = new ModuleManager(initializer, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
 
-        }
+        manager.Run();
 
-        [Fact]
-        public void ShouldWorkIfModuleLoadsAnotherOnDemandModuleWhenInitializing()
+        Assert.True(initializer.InitializeCalled);
+        Assert.Equal(2, initializer.InitializedModules.Count);
+    }
+
+    [Fact]
+    public void ShouldThrowOnRetrieverErrorAndWrapException()
+    {
+        var loader = new MockModuleInitializer();
+        var moduleInfo = CreateModuleInfo("NeedsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
+        var manager = new ModuleManager(loader, catalog);
+        var moduleTypeLoader = new MockModuleTypeLoader();
+
+        var retrieverException = new Exception();
+        moduleTypeLoader.LoadCompletedError = retrieverException;
+
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
+        Assert.False(loader.InitializeCalled);
+
+        try
         {
-            var initializer = new StubModuleInitializer();
-            var onDemandModule = CreateModuleInfo(typeof(MockModule), InitializationMode.OnDemand);
-            onDemandModule.ModuleName = "OnDemandModule";
-            var moduleThatLoadsOtherModule = CreateModuleInfo(typeof(MockModule), InitializationMode.WhenAvailable);
-            var catalog = new MockModuleCatalog { Modules = { moduleThatLoadsOtherModule, onDemandModule } };
-            ModuleManager manager = new ModuleManager(initializer, catalog);
-
-            bool onDemandModuleWasInitialized = false;
-            initializer.Initialize = m =>
-                                     {
-                                         if (m == moduleThatLoadsOtherModule)
-                                         {
-                                             manager.LoadModule("OnDemandModule");
-                                         }
-                                         else if (m == onDemandModule)
-                                         {
-                                             onDemandModuleWasInitialized = true;
-                                         }
-                                     };
-
             manager.Run();
-
-            Assert.True(onDemandModuleWasInitialized);
+        }
+        catch (Exception ex)
+        {
+            Assert.IsType<ModuleTypeLoadingException>(ex);
+            Assert.Equal(moduleInfo.ModuleName, ((ModularityException) ex).ModuleName);
+            Assert.Contains(moduleInfo.ModuleName, ex.Message);
+            Assert.Same(retrieverException, ex.InnerException);
+            return;
         }
 
+        //Assert.Fail("Exception not thrown.");
+    }
 
-        [Fact]
-        public void ModuleManagerIsDisposable()
+    [Fact]
+    public void ShouldThrowIfNoRetrieverCanRetrieveModule()
+    {
+        var ex = Assert.Throws<ModuleTypeLoaderNotFoundException>(() =>
         {
-            Mock<IModuleInitializer> mockInit = new Mock<IModuleInitializer>();
-            var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new Mock<IModuleCatalog>();
-            ModuleManager manager = new ModuleManager(mockInit.Object, catalog.Object);
-
-            IDisposable disposableManager = manager as IDisposable;
-            Assert.NotNull(disposableManager);
-        }
-
-        [Fact]
-        public void DisposeDoesNotThrowWithNonDisposableTypeLoaders()
-        {
-            Mock<IModuleInitializer> mockInit = new Mock<IModuleInitializer>();
-            var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new Mock<IModuleCatalog>();
-            ModuleManager manager = new ModuleManager(mockInit.Object, catalog.Object);
-
-            var mockTypeLoader = new Mock<IModuleTypeLoader>();
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { mockTypeLoader.Object };
-
-            try
+            var loader = new MockModuleInitializer();
+            var catalog = new MockModuleCatalog { Modules = { CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable) } };
+            var manager = new ModuleManager(loader, catalog)
             {
-                manager.Dispose();
-            }
-            catch (Exception)
-            {
-                //Assert.Fail();
-            }
-        }
+                ModuleTypeLoaders = new List<IModuleTypeLoader> { new MockModuleTypeLoader() { canLoadModuleTypeReturnValue = false } },
+            };
+            manager.Run();
+        });
+    }
 
-        [Fact]
-        public void DisposeCleansUpDisposableTypeLoaders()
+    [Fact]
+    public void ShouldWorkIfModuleLoadsAnotherOnDemandModuleWhenInitializing()
+    {
+        var initializer = new StubModuleInitializer();
+        var onDemandModule = CreateModuleInfo(typeof(MockModule), InitializationMode.OnDemand);
+        onDemandModule.ModuleName = "OnDemandModule";
+        var moduleThatLoadsOtherModule = CreateModuleInfo(typeof(MockModule), InitializationMode.WhenAvailable);
+        var catalog = new MockModuleCatalog { Modules = { moduleThatLoadsOtherModule, onDemandModule } };
+        var manager = new ModuleManager(initializer, catalog);
+
+        var onDemandModuleWasInitialized = false;
+        initializer.Initialize = m =>
         {
-            Mock<IModuleInitializer> mockInit = new Mock<IModuleInitializer>();
-            var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new Mock<IModuleCatalog>();
-            ModuleManager manager = new ModuleManager(mockInit.Object, catalog.Object);
+            if (m == moduleThatLoadsOtherModule)
+            {
+                manager.LoadModule("OnDemandModule");
+            }
+            else if (m == onDemandModule)
+            {
+                onDemandModuleWasInitialized = true;
+            }
+        };
 
-            var mockTypeLoader = new Mock<IModuleTypeLoader>();
-            var disposableMockTypeLoader = mockTypeLoader.As<IDisposable>();
-            disposableMockTypeLoader.Setup(loader => loader.Dispose());
+        manager.Run();
 
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { mockTypeLoader.Object };
+        Assert.True(onDemandModuleWasInitialized);
+    }
 
+
+    [Fact]
+    public void ModuleManagerIsDisposable()
+    {
+        var mockInit = new Mock<IModuleInitializer>();
+        var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new Mock<IModuleCatalog>();
+        var manager = new ModuleManager(mockInit.Object, catalog.Object);
+
+        var disposableManager = manager as IDisposable;
+        Assert.NotNull(disposableManager);
+    }
+
+    [Fact]
+    public void DisposeDoesNotThrowWithNonDisposableTypeLoaders()
+    {
+        var mockInit = new Mock<IModuleInitializer>();
+        var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new Mock<IModuleCatalog>();
+        var manager = new ModuleManager(mockInit.Object, catalog.Object);
+
+        var mockTypeLoader = new Mock<IModuleTypeLoader>();
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { mockTypeLoader.Object };
+
+        try
+        {
             manager.Dispose();
-
-            disposableMockTypeLoader.Verify(loader => loader.Dispose(), Times.Once());
         }
-
-        [Fact]
-        public void DisposeDoesNotThrowWithMixedTypeLoaders()
+        catch (Exception)
         {
-            Mock<IModuleInitializer> mockInit = new Mock<IModuleInitializer>();
-            var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
-            var catalog = new Mock<IModuleCatalog>();
-            ModuleManager manager = new ModuleManager(mockInit.Object, catalog.Object);
-
-            var mockTypeLoader1 = new Mock<IModuleTypeLoader>();
-
-            var mockTypeLoader = new Mock<IModuleTypeLoader>();
-            var disposableMockTypeLoader = mockTypeLoader.As<IDisposable>();
-            disposableMockTypeLoader.Setup(loader => loader.Dispose());
-
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader>() { mockTypeLoader1.Object, mockTypeLoader.Object };
-
-            try
-            {
-                manager.Dispose();
-            }
-            catch (Exception)
-            {
-                //Assert.Fail();
-            }
-
-            disposableMockTypeLoader.Verify(loader => loader.Dispose(), Times.Once());
-        }
-        private static ModuleInfo CreateModuleInfo(string name, InitializationMode initializationMode, params string[] dependsOn)
-        {
-            ModuleInfo moduleInfo = new ModuleInfo(name, name)
-            {
-                InitializationMode = initializationMode
-            };
-            moduleInfo.DependsOn.AddRange(dependsOn);
-            return moduleInfo;
-        }
-
-        private static ModuleInfo CreateModuleInfo(Type type, InitializationMode initializationMode, params string[] dependsOn)
-        {
-            ModuleInfo moduleInfo = new ModuleInfo(type.Name, type.AssemblyQualifiedName)
-            {
-                InitializationMode = initializationMode
-            };
-            moduleInfo.DependsOn.AddRange(dependsOn);
-            return moduleInfo;
+            //Assert.Fail();
         }
     }
 
-    internal class MockModule : IModule
+    [Fact]
+    public void DisposeCleansUpDisposableTypeLoaders()
     {
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            throw new NotImplementedException();
-        }
+        var mockInit = new Mock<IModuleInitializer>();
+        var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new Mock<IModuleCatalog>();
+        var manager = new ModuleManager(mockInit.Object, catalog.Object);
 
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            throw new NotImplementedException();
-        }
+        var mockTypeLoader = new Mock<IModuleTypeLoader>();
+        var disposableMockTypeLoader = mockTypeLoader.As<IDisposable>();
+        disposableMockTypeLoader.Setup(loader => loader.Dispose());
+
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { mockTypeLoader.Object };
+
+        manager.Dispose();
+
+        disposableMockTypeLoader.Verify(loader => loader.Dispose(), Times.Once());
     }
 
-    internal class MockModuleCatalog : IModuleCatalog
+    [Fact]
+    public void DisposeDoesNotThrowWithMixedTypeLoaders()
     {
-        public List<IModuleInfo> Modules = new List<IModuleInfo>();
-        public Func<IModuleInfo, IEnumerable<IModuleInfo>> GetDependentModules;
+        var mockInit = new Mock<IModuleInitializer>();
+        var moduleInfo = CreateModuleInfo("needsRetrieval", InitializationMode.WhenAvailable);
+        var catalog = new Mock<IModuleCatalog>();
+        var manager = new ModuleManager(mockInit.Object, catalog.Object);
 
-        public Func<IEnumerable<IModuleInfo>, IEnumerable<IModuleInfo>> CompleteListWithDependencies;
-        public Action ValidateCatalog;
+        var mockTypeLoader1 = new Mock<IModuleTypeLoader>();
 
-        public void Initialize()
+        var mockTypeLoader = new Mock<IModuleTypeLoader>();
+        var disposableMockTypeLoader = mockTypeLoader.As<IDisposable>();
+        disposableMockTypeLoader.Setup(loader => loader.Dispose());
+
+        manager.ModuleTypeLoaders = new List<IModuleTypeLoader>() { mockTypeLoader1.Object, mockTypeLoader.Object };
+
+        try
         {
-            this.ValidateCatalog?.Invoke();
+            manager.Dispose();
+        }
+        catch (Exception)
+        {
+            //Assert.Fail();
         }
 
-        IEnumerable<IModuleInfo> IModuleCatalog.Modules => Modules;
-
-        IEnumerable<IModuleInfo> IModuleCatalog.GetDependentModules(IModuleInfo moduleInfo)
-        {
-            if (GetDependentModules == null)
-                return new List<IModuleInfo>();
-
-            return GetDependentModules(moduleInfo);
-        }
-
-        IEnumerable<IModuleInfo> IModuleCatalog.CompleteListWithDependencies(IEnumerable<IModuleInfo> modules)
-        {
-            if (CompleteListWithDependencies != null)
-                return CompleteListWithDependencies(modules);
-            return modules;
-        }
-
-
-        public IModuleCatalog AddModule(IModuleInfo moduleInfo)
-        {
-            this.Modules.Add(moduleInfo);
-            return this;
-        }
+        disposableMockTypeLoader.Verify(loader => loader.Dispose(), Times.Once());
     }
 
-    internal class MockModuleInitializer : IModuleInitializer
+    private static ModuleInfo CreateModuleInfo(string name, InitializationMode initializationMode, params string[] dependsOn)
     {
-        public bool InitializeCalled;
-        public List<IModuleInfo> InitializedModules = new List<IModuleInfo>();
-
-        public void Initialize(IModuleInfo moduleInfo)
+        var moduleInfo = new ModuleInfo(name, name)
         {
-            InitializeCalled = true;
-            this.InitializedModules.Add(moduleInfo);
-        }
+            InitializationMode = initializationMode,
+        };
+        moduleInfo.DependsOn.AddRange(dependsOn);
+        return moduleInfo;
     }
 
-    internal class StubModuleInitializer : IModuleInitializer
+    private static ModuleInfo CreateModuleInfo(Type type, InitializationMode initializationMode, params string[] dependsOn)
     {
-        public Action<ModuleInfo> Initialize;
-
-        void IModuleInitializer.Initialize(IModuleInfo moduleInfo)
+        var moduleInfo = new ModuleInfo(type.Name, type.AssemblyQualifiedName)
         {
-            this.Initialize((ModuleInfo)moduleInfo);
-        }
+            InitializationMode = initializationMode,
+        };
+        moduleInfo.DependsOn.AddRange(dependsOn);
+        return moduleInfo;
+    }
+}
+
+internal class MockModule : IModule
+{
+    public void OnInitialized(IContainerProvider containerProvider)
+    {
+        throw new NotImplementedException();
     }
 
-    internal class MockDelegateModuleInitializer : IModuleInitializer
+    public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        public Action<ModuleInfo> LoadBody;
+        throw new NotImplementedException();
+    }
+}
 
-        public void Initialize(IModuleInfo moduleInfo)
-        {
-            LoadBody((ModuleInfo)moduleInfo);
-        }
+internal class MockModuleCatalog : IModuleCatalog
+{
+    public List<IModuleInfo> Modules = new List<IModuleInfo>();
+    public Func<IModuleInfo, IEnumerable<IModuleInfo>> GetDependentModules;
+
+    public Func<IEnumerable<IModuleInfo>, IEnumerable<IModuleInfo>> CompleteListWithDependencies;
+    public Action ValidateCatalog;
+
+    public void Initialize()
+    {
+        this.ValidateCatalog?.Invoke();
+    }
+
+    IEnumerable<IModuleInfo> IModuleCatalog.Modules => Modules;
+
+    IEnumerable<IModuleInfo> IModuleCatalog.GetDependentModules(IModuleInfo moduleInfo)
+    {
+        if (GetDependentModules == null)
+            return new List<IModuleInfo>();
+
+        return GetDependentModules(moduleInfo);
+    }
+
+    IEnumerable<IModuleInfo> IModuleCatalog.CompleteListWithDependencies(IEnumerable<IModuleInfo> modules)
+    {
+        if (CompleteListWithDependencies != null)
+            return CompleteListWithDependencies(modules);
+        return modules;
+    }
+
+
+    public IModuleCatalog AddModule(IModuleInfo moduleInfo)
+    {
+        this.Modules.Add(moduleInfo);
+        return this;
+    }
+}
+
+internal class MockModuleInitializer : IModuleInitializer
+{
+    public bool InitializeCalled;
+    public List<IModuleInfo> InitializedModules = new List<IModuleInfo>();
+
+    public void Initialize(IModuleInfo moduleInfo)
+    {
+        InitializeCalled = true;
+        this.InitializedModules.Add(moduleInfo);
+    }
+}
+
+internal class StubModuleInitializer : IModuleInitializer
+{
+    public Action<ModuleInfo> Initialize;
+
+    void IModuleInitializer.Initialize(IModuleInfo moduleInfo)
+    {
+        this.Initialize((ModuleInfo) moduleInfo);
+    }
+}
+
+internal class MockDelegateModuleInitializer : IModuleInitializer
+{
+    public Action<ModuleInfo> LoadBody;
+
+    public void Initialize(IModuleInfo moduleInfo)
+    {
+        LoadBody((ModuleInfo) moduleInfo);
     }
 }

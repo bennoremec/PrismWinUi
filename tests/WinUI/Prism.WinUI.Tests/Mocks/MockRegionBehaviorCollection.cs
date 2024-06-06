@@ -1,16 +1,12 @@
-
-
 using System.Collections;
-using System.Collections.Generic;
 using Prism.Regions;
 
-namespace Prism.Wpf.Tests.Mocks
+namespace Prism.WinUI.Tests.Mocks;
+
+internal class MockRegionBehaviorCollection : Dictionary<string, IRegionBehavior>, IRegionBehaviorCollection
 {
-    internal class MockRegionBehaviorCollection : Dictionary<string, IRegionBehavior>, IRegionBehaviorCollection
+    IEnumerator IEnumerable.GetEnumerator()
     {
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        return GetEnumerator();
     }
 }

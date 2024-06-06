@@ -1,22 +1,17 @@
-
-
-using System;
 using Prism.Events;
 
-namespace Prism.Wpf.Tests.Mocks
+namespace Prism.WinUI.Tests.Mocks;
+
+internal class MockDelegateReference : IDelegateReference
 {
-    class MockDelegateReference : IDelegateReference
+    public Delegate Target { get; set; }
+
+    public MockDelegateReference()
     {
-        public Delegate Target { get; set; }
+    }
 
-        public MockDelegateReference()
-        {
-
-        }
-
-        public MockDelegateReference(Delegate target)
-        {
-            Target = target;
-        }
+    public MockDelegateReference(Delegate target)
+    {
+        Target = target;
     }
 }

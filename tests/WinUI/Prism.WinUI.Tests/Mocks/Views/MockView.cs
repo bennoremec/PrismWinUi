@@ -1,8 +1,5 @@
-﻿using System.Windows;
+﻿namespace Prism.WinUI.Tests.Mocks.Views;
 
-namespace Prism.Wpf.Tests.Mocks.Views
+public class MockView : FrameworkElement
 {
-    public class MockView : FrameworkElement
-    {
-    }
 }

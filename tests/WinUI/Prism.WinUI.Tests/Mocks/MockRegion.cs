@@ -1,123 +1,113 @@
-
-
-using System;
 using System.ComponentModel;
 using Prism.Regions;
 
-namespace Prism.Wpf.Tests.Mocks
+namespace Prism.WinUI.Tests.Mocks;
+
+internal class MockRegion : IRegion
 {
-    internal class MockRegion : IRegion
+    public event PropertyChangedEventHandler PropertyChanged;
+    public Func<string, object> GetViewStringDelegate { get; set; }
+
+    private readonly MockViewsCollection views = new MockViewsCollection();
+
+    public IViewsCollection Views
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public Func<string, object> GetViewStringDelegate { get; set; }
+        get { return views; }
+    }
 
-        private MockViewsCollection views = new MockViewsCollection();
+    public IViewsCollection ActiveViews
+    {
+        get { throw new NotImplementedException(); }
+    }
 
-        public IViewsCollection Views
-        {
-            get { return views; }
-        }
+    public object Context
+    {
+        get { throw new NotImplementedException(); }
+        set { throw new NotImplementedException(); }
+    }
 
-        public IViewsCollection ActiveViews
-        {
-            get { throw new System.NotImplementedException(); }
-        }
+    public NavigationParameters NavigationParameters
+    {
+        get { throw new NotImplementedException(); }
+        set { throw new NotImplementedException(); }
+    }
 
-        public object Context
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+    public string Name { get; set; }
 
-        public NavigationParameters NavigationParameters
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+    public IRegionManager Add(object view)
+    {
+        this.views.Add(view);
+        return null;
+    }
 
-        public string Name { get; set; }
+    public IRegionManager Add(object view, string viewName)
+    {
+        return Add(view);
+    }
 
-        public IRegionManager Add(object view)
-        {
-            this.views.Add(view);
-            return null;
-        }
+    public IRegionManager Add(object view, string viewName, bool createRegionManagerScope)
+    {
+        throw new NotImplementedException();
+    }
 
-        public IRegionManager Add(object view, string viewName)
-        {
-            return Add(view);
-        }
+    public void Remove(object view)
+    {
+        throw new NotImplementedException();
+    }
 
-        public IRegionManager Add(object view, string viewName, bool createRegionManagerScope)
-        {
-            throw new System.NotImplementedException();
-        }
+    public void Activate(object view)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void Remove(object view)
-        {
-            throw new System.NotImplementedException();
-        }
+    public void Deactivate(object view)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void Activate(object view)
-        {
-            throw new System.NotImplementedException();
-        }
+    public object GetView(string viewName)
+    {
+        return GetViewStringDelegate(viewName);
+    }
 
-        public void Deactivate(object view)
-        {
-            throw new System.NotImplementedException();
-        }
+    public IRegionManager RegionManager { get; set; }
 
-        public object GetView(string viewName)
-        {
-            return GetViewStringDelegate(viewName);
-        }
+    public IRegionBehaviorCollection Behaviors
+    {
+        get { throw new NotImplementedException(); }
+    }
 
-        public IRegionManager RegionManager { get; set; }
-
-        public IRegionBehaviorCollection Behaviors
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public bool Navigate(System.Uri source)
-        {
-            throw new System.NotImplementedException();
-        }
+    public bool Navigate(Uri source)
+    {
+        throw new NotImplementedException();
+    }
 
 
-        public void RequestNavigate(System.Uri target, System.Action<NavigationResult> navigationCallback)
-        {
-            throw new System.NotImplementedException();
-        }
+    public void RequestNavigate(Uri target, Action<NavigationResult> navigationCallback)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void RequestNavigate(System.Uri target, System.Action<NavigationResult> navigationCallback, NavigationParameters navigationParameters)
-        {
-            throw new System.NotImplementedException();
-        }
+    public void RequestNavigate(Uri target, Action<NavigationResult> navigationCallback, NavigationParameters navigationParameters)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void RemoveAll()
-        {
-            throw new NotImplementedException();
-        }
+    public void RemoveAll()
+    {
+        throw new NotImplementedException();
+    }
 
-        public IRegionNavigationService NavigationService
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+    public IRegionNavigationService NavigationService
+    {
+        get { throw new NotImplementedException(); }
+        set { throw new NotImplementedException(); }
+    }
 
 
-        public System.Comparison<object> SortComparison
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-                throw new System.NotImplementedException();
-            }
-        }
+    public Comparison<object> SortComparison
+    {
+        get { throw new NotImplementedException(); }
+        set { throw new NotImplementedException(); }
     }
 }

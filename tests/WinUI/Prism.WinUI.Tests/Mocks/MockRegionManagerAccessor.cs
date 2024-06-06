@@ -1,44 +1,39 @@
-
-
-using System;
-using System.Windows;
 using Prism.Regions;
 
-namespace Prism.Wpf.Tests.Mocks
+namespace Prism.WinUI.Tests.Mocks;
+
+internal class MockRegionManagerAccessor : IRegionManagerAccessor
 {
-    internal class MockRegionManagerAccessor : IRegionManagerAccessor
+    public Func<DependencyObject, string> GetRegionName;
+    public Func<DependencyObject, IRegionManager> GetRegionManager;
+
+    public event EventHandler UpdatingRegions;
+
+    string IRegionManagerAccessor.GetRegionName(DependencyObject element)
     {
-        public Func<DependencyObject, string> GetRegionName;
-        public Func<DependencyObject, IRegionManager> GetRegionManager;
+        return this.GetRegionName(element);
+    }
 
-        public event EventHandler UpdatingRegions;
-
-        string IRegionManagerAccessor.GetRegionName(DependencyObject element)
+    IRegionManager IRegionManagerAccessor.GetRegionManager(DependencyObject element)
+    {
+        if (this.GetRegionManager != null)
         {
-            return this.GetRegionName(element);
+            return this.GetRegionManager(element);
         }
 
-        IRegionManager IRegionManagerAccessor.GetRegionManager(DependencyObject element)
-        {
-            if (this.GetRegionManager != null)
-            {
-                return this.GetRegionManager(element);
-            }
+        return null;
+    }
 
-            return null;
-        }
-
-        public void UpdateRegions()
+    public void UpdateRegions()
+    {
+        if (this.UpdatingRegions != null)
         {
-            if (this.UpdatingRegions != null)
-            {
-                this.UpdatingRegions(this, EventArgs.Empty);
-            }
+            this.UpdatingRegions(this, EventArgs.Empty);
         }
+    }
 
-        public int GetSubscribersCount()
-        {
-            return this.UpdatingRegions != null ? this.UpdatingRegions.GetInvocationList().Length : 0;
-        }
+    public int GetSubscribersCount()
+    {
+        return this.UpdatingRegions != null ? this.UpdatingRegions.GetInvocationList().Length : 0;
     }
 }

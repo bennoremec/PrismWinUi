@@ -1,24 +1,20 @@
-
-
 using Prism.Modularity;
 using Xunit;
 
-namespace Prism.Wpf.Tests.Modularity
+namespace Prism.WinUI.Tests.Modularity;
+
+public class ModuleInfoGroupFixture
 {
-
-    public class ModuleInfoGroupFixture
+    [Fact]
+    public void ShouldForwardValuesToModuleInfo()
     {
-        [Fact]
-        public void ShouldForwardValuesToModuleInfo()
-        {
-            ModuleInfoGroup group = new ModuleInfoGroup();
-            group.Ref = "MyCustomGroupRef";
-            ModuleInfo moduleInfo = new ModuleInfo();
-            Assert.Null(moduleInfo.Ref);
+        var group = new ModuleInfoGroup();
+        group.Ref = "MyCustomGroupRef";
+        var moduleInfo = new ModuleInfo();
+        Assert.Null(moduleInfo.Ref);
 
-            group.Add(moduleInfo);
+        group.Add(moduleInfo);
 
-            Assert.Equal(group.Ref, moduleInfo.Ref);
-        }
+        Assert.Equal(group.Ref, moduleInfo.Ref);
     }
 }

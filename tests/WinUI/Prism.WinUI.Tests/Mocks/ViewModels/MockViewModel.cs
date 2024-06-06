@@ -1,27 +1,20 @@
 ﻿using Prism.Mvvm;
 
-namespace Prism.Wpf.Tests.Mocks.ViewModels
+namespace Prism.WinUI.Tests.Mocks.ViewModels;
+
+public class MockViewModel : BindableBase
 {
-    public class MockViewModel : BindableBase
+    private int mockProperty;
+
+    public int MockProperty
     {
-        private int mockProperty;
+        get { return this.mockProperty; }
 
-        public int MockProperty
-        {
-            get
-            {
-                return this.mockProperty;
-            }
+        set { this.SetProperty(ref mockProperty, value); }
+    }
 
-            set
-            {
-                this.SetProperty(ref mockProperty, value);
-            }
-        }
-
-        internal void InvokeOnPropertyChanged()
-        {
-            this.RaisePropertyChanged(nameof(MockProperty));
-        }
+    internal void InvokeOnPropertyChanged()
+    {
+        this.RaisePropertyChanged(nameof(MockProperty));
     }
 }
