@@ -23,6 +23,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.Core.Tests", "tests\P
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WinUI", "WinUI", "{5CB78CA1-4F19-4583-8F9C-5A4A019D1581}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.WinUI.Tests", "tests\WinUI\Prism.WinUI.Tests\Prism.WinUI.Tests.csproj", "{29328F3B-5B32-44F1-9F27-50136CEB73C7}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Prism.Container.WinUI.Shared", "tests\WinUI\Prism.Container.WinUI.Shared\Prism.Container.WinUI.Shared.shproj", "{E8191B08-C5A6-48E2-878B-47C86C401739}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.DryIoc.WinUI.Tests", "tests\WinUI\Prism.DryIoc.WinUI.Tests\Prism.DryIoc.WinUI.Tests.csproj", "{7E07BB7F-329D-4D88-B175-B674B8B40AA4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prism.IocContainer.WinUI.Tests.Support", "tests\WinUI\Prism.IocContainer.WinUI.Tests.Support\Prism.IocContainer.WinUI.Tests.Support.csproj", "{A26EB36C-E5A1-46D5-AF17-A9FDEABFAD21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +53,18 @@ Global
 		{BA54B9E3-7BC7-4D69-8050-32BF08C2F686}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA54B9E3-7BC7-4D69-8050-32BF08C2F686}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA54B9E3-7BC7-4D69-8050-32BF08C2F686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29328F3B-5B32-44F1-9F27-50136CEB73C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29328F3B-5B32-44F1-9F27-50136CEB73C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29328F3B-5B32-44F1-9F27-50136CEB73C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29328F3B-5B32-44F1-9F27-50136CEB73C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E07BB7F-329D-4D88-B175-B674B8B40AA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E07BB7F-329D-4D88-B175-B674B8B40AA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E07BB7F-329D-4D88-B175-B674B8B40AA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E07BB7F-329D-4D88-B175-B674B8B40AA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A26EB36C-E5A1-46D5-AF17-A9FDEABFAD21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A26EB36C-E5A1-46D5-AF17-A9FDEABFAD21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A26EB36C-E5A1-46D5-AF17-A9FDEABFAD21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A26EB36C-E5A1-46D5-AF17-A9FDEABFAD21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +78,10 @@ Global
 		{767D943A-7F8A-432B-9E23-8211C958A958} = {F73844CC-929F-4B09-9F58-A609FE4E246C}
 		{BA54B9E3-7BC7-4D69-8050-32BF08C2F686} = {BE223493-B86B-415E-AC65-3790F49E1A80}
 		{5CB78CA1-4F19-4583-8F9C-5A4A019D1581} = {BE223493-B86B-415E-AC65-3790F49E1A80}
+		{29328F3B-5B32-44F1-9F27-50136CEB73C7} = {5CB78CA1-4F19-4583-8F9C-5A4A019D1581}
+		{E8191B08-C5A6-48E2-878B-47C86C401739} = {5CB78CA1-4F19-4583-8F9C-5A4A019D1581}
+		{7E07BB7F-329D-4D88-B175-B674B8B40AA4} = {5CB78CA1-4F19-4583-8F9C-5A4A019D1581}
+		{A26EB36C-E5A1-46D5-AF17-A9FDEABFAD21} = {5CB78CA1-4F19-4583-8F9C-5A4A019D1581}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF540779-5D31-4280-8F83-1A80F285E076}
@@ -65,5 +89,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{6e7ec81d-da39-4c4f-a898-0148558c34f4}*SharedItemsImports = 13
 		src\Containers\Prism.DryIoc.Shared\Prism.DryIoc.Shared.projitems*{767d943a-7f8a-432b-9e23-8211c958a958}*SharedItemsImports = 5
+		tests\WinUI\Prism.Container.WinUI.Shared\Prism.Container.Wpf.Shared.projitems*{7e07bb7f-329d-4d88-b175-b674b8b40aa4}*SharedItemsImports = 5
+		tests\WinUI\Prism.Container.WinUI.Shared\Prism.Container.Wpf.Shared.projitems*{e8191b08-c5a6-48e2-878b-47c86c401739}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
