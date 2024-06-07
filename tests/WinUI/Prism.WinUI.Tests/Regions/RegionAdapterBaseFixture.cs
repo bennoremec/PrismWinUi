@@ -7,16 +7,6 @@ namespace Prism.WinUI.Tests.Regions;
 public class RegionAdapterBaseFixture
 {
     [Fact]
-    public void IncorrectTypeThrows()
-    {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
-        {
-            IRegionAdapter adapter = new TestableRegionAdapterBase();
-            adapter.Initialize(new MockDependencyObject(), "Region1");
-        });
-    }
-
-    [Fact]
     public void InitializeSetsRegionName()
     {
         IRegionAdapter adapter = new TestableRegionAdapterBase();

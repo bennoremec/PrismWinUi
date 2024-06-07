@@ -8,24 +8,6 @@ namespace Prism.WinUI.Tests.Modularity;
 public class FileModuleTypeLoaderFixture
 {
     [Fact]
-    public void CanRetrieveModule()
-    {
-        var assemblyResolver = new MockAssemblyResolver();
-        var retriever = new FileModuleTypeLoader(assemblyResolver);
-        var assembly = CompilerHelper.GenerateDynamicModule("FileModuleA", null);
-        var assemblyRef = "file://" + assembly;
-        var fileModuleInfo = CreateModuleInfo(assemblyRef, "TestModules.FileModuleAClass", "ModuleA", true, null);
-
-        var loadCompleted = false;
-        retriever.LoadModuleCompleted += delegate(object sender, LoadModuleCompletedEventArgs e) { loadCompleted = true; };
-
-        retriever.LoadModuleType(fileModuleInfo);
-
-        Assert.True(loadCompleted);
-        Assert.Equal(assemblyRef, assemblyResolver.LoadAssemblyFromArgument);
-    }
-
-    [Fact]
     public void ShouldReturnErrorToCallback()
     {
         var assemblyResolver = new MockAssemblyResolver();

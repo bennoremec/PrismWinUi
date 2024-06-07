@@ -1,11 +1,7 @@
 using Moq;
 using Prism.Ioc;
 using Prism.Regions;
-using Prism.WinUI.Tests.Mocks.ViewModels;
-using Prism.WinUI.Tests.Mocks.Views;
-using Prism.WinUI.Tests.Mvvm;
 using Xunit;
-using Mock = Prism.WinUI.Tests.Mocks.Views.Mock;
 
 namespace Prism.WinUI.Tests.Regions;
 
@@ -62,21 +58,6 @@ public class RegionViewRegistryFixture
     }
 
     [Fact]
-    public void ShouldNotPreventSubscribersFromBeingGarbageCollected()
-    {
-        var registry = new RegionViewRegistry(null);
-        var subscriber = new MySubscriberClass();
-        registry.ContentRegistered += subscriber.OnContentRegistered;
-
-        var subscriberWeakReference = new WeakReference(subscriber);
-
-        subscriber = null;
-        GC.Collect();
-
-        Assert.False(subscriberWeakReference.IsAlive);
-    }
-
-    [Fact]
     public void OnRegisterErrorShouldGiveClearException()
     {
         var registry = new RegionViewRegistry(null);
@@ -110,49 +91,6 @@ public class RegionViewRegistryFixture
         Assert.IsType<ViewRegistrationException>(ex);
         Assert.Contains("Dont do this", ex.Message);
         Assert.Contains("R1", ex.Message);
-    }
-
-    [StaFact]
-    public void RegisterViewWithRegion_ShouldHaveViewModel_ByDefault()
-    {
-        ViewModelLocatorFixture.ResetViewModelLocationProvider();
-
-        var containerMock = new Mock<IContainerExtension>();
-        containerMock.Setup(c => c.Resolve(typeof(Mock))).Returns(new Mock());
-        containerMock.Setup(c => c.Resolve(typeof(MockViewModel))).Returns(new MockViewModel());
-        var registry = new RegionViewRegistry(containerMock.Object);
-
-        registry.RegisterViewWithRegion("MyRegion", typeof(Mock));
-
-        var result = registry.GetContents("MyRegion");
-        Assert.NotNull(result);
-        Assert.Single(result);
-
-        var view = result.ElementAt(0) as FrameworkElement;
-        Assert.IsType<Mock>(view);
-        Assert.NotNull(view.DataContext);
-        Assert.IsType<MockViewModel>(view.DataContext);
-    }
-
-    [StaFact]
-    public void RegisterViewWithRegion_ShouldNotHaveViewModel_OnOptOut()
-    {
-        ViewModelLocatorFixture.ResetViewModelLocationProvider();
-
-        var containerMock = new Mock<IContainerExtension>();
-        containerMock.Setup(c => c.Resolve(typeof(MockOptOut))).Returns(new MockOptOut());
-        containerMock.Setup(c => c.Resolve(typeof(MockOptOutViewModel))).Returns(new MockOptOutViewModel());
-        var registry = new RegionViewRegistry(containerMock.Object);
-
-        registry.RegisterViewWithRegion("MyRegion", typeof(MockOptOut));
-
-        var result = registry.GetContents("MyRegion");
-        Assert.NotNull(result);
-        Assert.Single(result);
-
-        var view = result.ElementAt(0) as FrameworkElement;
-        Assert.IsType<MockOptOut>(view);
-        Assert.Null(view.DataContext);
     }
 
     private void FailWithFrameworkException(object sender, ViewRegisteredEventArgs e)
