@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows10.0.19041</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.UI.Xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DryIoc.dll" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Xunit.StaFact" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\WinUi\Prism.DryIoc.WinUI\Prism.DryIoc.WinUI.csproj" />
+    <ProjectReference Include="..\Prism.IocContainer.WinUI.Tests.Support\Prism.IocContainer.WinUI.Tests.Support.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Prism.Container.WinUI.Shared\Prism.Container.Wpf.Shared.projitems" Label="Shared" />
+
+</Project>
